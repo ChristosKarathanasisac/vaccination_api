@@ -1,0 +1,199 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<html>
+  <head> </head>
+  <body onload="getVaccinationCenters();">
+    <select id="VacCentersDropDown"></select>
+
+    <div>
+      <label for="timeslot">Prefered Date:</label>
+      <input type="date" id="timeslotDate" name="timeslotDatePicker" />
+      <input
+        type="time"
+        id="timeslotStartTime"
+        name="timeslotStartTimePicker"
+      />
+      <input type="time" id="timeslotEndTime" name="timeslotEndTimePicker" />
+      <button name="showAllTimeSlots" onclick="insertTimeSlot()">
+        Insert Timeslot
+      </button>
+    </div>
+    <form>
+      <label for="docfname">First name:</label><br />
+      <input type="text" id="docfname" name="docfname" /><br />
+      <label for="doclname">Last name:</label><br />
+      <input type="text" id="doclname" name="doclname" /><br /><br />
+      <label for="docamka">AMKA:</label><br />
+      <input type="text" id="docamka" name="docamka" /><br /><br />
+    </form>
+    <br /><br />
+
+    <!--<table border="1" id="resultsTable">
+      <tr>
+        <th width="200">Day</th>
+        <th width="200">Hour</th>
+        <th width="200">Minute</th>
+      </tr>
+    </table>-->
+    <script>
+      var vacCentersDropDown = document.getElementById("VacCentersDropDown");
+      vacCentersDropDown.addEventListener("change", (e) => {
+        console.log("CHANGED");
+      });
+      function insertTimeSlot() {
+        var selectedDate = document.getElementById("timeslotDate").value;
+        var startTime = document.getElementById("timeslotStartTime").value;
+        var endTime = document.getElementById("timeslotEndTime").value;
+        var vaccinationCenter =
+          document.getElementById("VacCentersDropDown").value;
+        var dateArray = String(selectedDate).split("-");
+        var year;
+        var month;
+        var day;
+        var startTimeArray;
+        var startHour;
+        var startMin;
+        var endTimeArray;
+        var endtHour;
+        var endMin;
+
+        var docFirstName = document.getElementById("docfname").value;
+        var docLastName = document.getElementById("doclname").value;
+        var docAMKA = document.getElementById("docamka").value;
+
+        console.log(selectedDate);
+        if (selectedDate) {
+          console.log("First If");
+          var dateArray = String(selectedDate).split("-");
+          var year = dateArray[0];
+          var month = dateArray[1];
+          var day = dateArray[2];
+        }
+        if (startTime) {
+          console.log("Second If");
+          var startTimeArray = String(startTime).split(":");
+          var startHour = startTimeArray[0];
+          var startMin = startTimeArray[1];
+        }
+        if (endTime) {
+          console.log("Third If");
+          var endTimeArray = String(endTime).split(":");
+          var endtHour = endTimeArray[0];
+          var endMin = endTimeArray[1];
+        }
+        console.log("year: " + year);
+        console.log("month: " + month);
+        console.log("day: " + day);
+        console.log("startHour: " + startHour);
+        console.log("startMin: " + startMin);
+        console.log("endtHour: " + endtHour);
+        console.log("endMin: " + endMin);
+        console.log("Vaccination Center: " + vaccinationCenter);
+        console.log("docFirstName: " + docFirstName);
+        console.log("docLastName: " + docLastName);
+        console.log("docAMKA: " + docAMKA);
+
+        /*var settings = {
+          url:
+            "http://localhost:8080/insertTimeSlot?" +
+            "day=" +
+            day +
+            "&month=" +
+            month +
+            "&year=" +
+            year +
+            "&startHour=" +
+            startHour +
+            "&startMinute=" +
+            startMin +
+            "&endHour=" +
+            endtHour +
+            "&endMinute=" +
+            endMin +
+            "&vacCenterCode=" +
+            vaccinationCenter,
+          method: "GET",
+          timeout: 0,
+          processData: false,
+          mimeType: "multipart/form-data",
+          contentType: false,
+        };*/
+        var settings = {
+          url: "http://localhost:8080/insertTimeSlot",
+          method: "POST",
+          timeout: 0,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          data: JSON.stringify({
+            day: day,
+            month: month,
+            year: year,
+            startHour: startHour,
+            startMin: startMin,
+            endHour: endtHour,
+            endMin: endMin,
+            vaccinationCenterCode: vaccinationCenter,
+            doc: {
+              amka: docAMKA,
+              firstName: docFirstName,
+              lastName: docLastName,
+            },
+          }),
+        };
+        /* console.log(
+          "http://localhost:8080/insertTimeSlot?" +
+            "day=" +
+            day +
+            "&month=" +
+            month +
+            "&year=" +
+            year +
+            "&startHour=" +
+            startHour +
+            "&startMinute=" +
+            startMin +
+            "&endHour=" +
+            endtHour +
+            "&endMinute=" +
+            endMin +
+            "&vacCenterCode=" +
+            vaccinationCenter
+        );*/
+        $.ajax(settings).done(function (response) {
+          //showResult(response);
+        });
+      }
+      function getVaccinationCenters() {
+        console.log("We are inside getVaccinationCenters()");
+        var settings = {
+          url: "http://localhost:8080/getVaccinationCenters",
+          method: "GET",
+          timeout: 0,
+          processData: false,
+          mimeType: "multipart/form-data",
+          contentType: false,
+        };
+
+        $.ajax(settings).done(function (response) {
+          result = jQuery.parseJSON(response);
+          console.log(result);
+          //var table = document.getElementById("resultsTable");
+          var countriesDropDown = document.getElementById("VacCentersDropDown");
+          //var countriesData = {};
+          var i = 0;
+          for (var k in result) {
+            var vc = result[k];
+            var option = document.createElement("option");
+            option.setAttribute("value", vc.code);
+
+            var optionText = document.createTextNode(vc.address);
+            option.appendChild(optionText);
+            vacCentersDropDown.appendChild(option);
+            i++;
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

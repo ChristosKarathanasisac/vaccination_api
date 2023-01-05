@@ -1,0 +1,308 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<html>
+  <head> </head>
+  <body onload="getVaccinationCenters();">
+    <select id="VacCentersDropDown"></select>
+    <div>
+      <label for="timeslot">Prefered Date:</label>
+      <input type="date" id="timeslot" name="timeslotDatePicker" />
+      <button name="showAllTimeSlots" onclick="showAll();">
+        Show Timeslots
+      </button>
+    </div>
+
+    <br /><br />
+
+    <table border="1" id="resultsTable">
+      <tr>
+        <th width="200">Start</th>
+        <th width="200">End</th>
+        <th width="200">Doctor</th>
+      </tr>
+    </table>
+    <div>
+      <label>CITIZEN</label></label><br />
+      <label for="fname">First name:</label><br />
+      <input type="text" id="fname" name="fname" /><br />
+      <label for="lname">Last name:</label><br />
+      <input type="text" id="lname" name="lname" /><br /><br />
+      <label for="amka">AMKA:</label><br />
+      <input type="text" id="amka" name="amka" /><br /><br />
+      <br /><br />
+      <label>TIMESLOT</label></label><br />
+      <label for="day">DAY</label><br />
+      <input type="text" id="day" name="day" /><br />
+
+      <label for="month">MONTH</label><br />
+      <input type="text" id="month" name="month" /><br /><br />
+
+      <label for="year">YEAR</label><br />
+      <input type="text" id="year" name="amka" /><br /><br />
+
+      <label for="startHour">Start Hour:</label><br />
+      <input type="text" id="startHour" name="startHour" /><br />
+
+      <label for="startMin">Start Min:</label><br />
+      <input type="text" id="startMin" name="startMin" /><br /><br />
+
+      <label for="endHour">End Hour</label><br />
+      <input type="text" id="endHour" name="endHour" /><br /><br />
+
+      <label for="endMin">End Min</label><br />
+      <input type="text" id="endMin" name="endMin" /><br /><br />
+
+      <label>DOCTOR</label></label><br />
+      <label for="docfname">First name:</label><br />
+      <input type="text" id="docfname" name="docfname" /><br />
+      <label for="doclname">Last name:</label><br />
+      <input type="text" id="doclname" name="doclname" /><br /><br />
+      <label for="docamka">AMKA:</label><br />
+      <input type="text" id="docamka" name="docamka" /><br /><br />
+      <button name="insertAppointment" onclick="insertAppointment();">
+        Inser Appointment
+      </button>
+      <button name="updateAppointment" onclick="updateAppointment();">
+        Update Appointment
+      </button>
+      
+    </div>
+    <script>
+      var vacCentersDropDown = document.getElementById("VacCentersDropDown");
+      vacCentersDropDown.addEventListener("change", (e) => {
+        console.log("CHANGED");
+        showAll();
+      });
+      function showAll() {
+        var selectedDate = document.getElementById("timeslot").value;
+        var vaccinationCenter =
+          document.getElementById("VacCentersDropDown").value;
+        if (selectedDate) {
+          console.log(String(selectedDate));
+          var dateArray = String(selectedDate).split("-");
+          var year = dateArray[0];
+          var month = dateArray[1];
+          var day = dateArray[2];
+          console.log("YEAR: " + year);
+          console.log("MONTH: " + month);
+          console.log("DAY: " + day);
+        }
+        var settings = {
+          url:
+            "http://localhost:8080/getAvailableTimeslots?day=" +
+            day +
+            "&month=" +
+            month +
+            "&year=" +
+            year +
+            "&vacCenterCode=" +
+            vaccinationCenter,
+          method: "GET",
+          timeout: 0,
+          processData: false,
+          mimeType: "multipart/form-data",
+          contentType: false,
+        };
+
+        $.ajax(settings).done(function (response) {
+          console.log(
+            "http://localhost:8080/getAvailableTimeslots?day=" +
+              day +
+              "&month=" +
+              month +
+              "&year=" +
+              year +
+              "&vacCenterCode=" +
+              vaccinationCenter
+          );
+          updateTable(response);
+        });
+      }
+
+      function updateTable(json) {
+        //if (!json) {
+        //return;
+        //}
+        result = jQuery.parseJSON(json);
+        var table = document.getElementById("resultsTable");
+
+        var rowCount = table.rows.length;
+        for (var i = rowCount - 1; i > 0; i--) {
+          table.deleteRow(i);
+        }
+
+        for (var k in result) {
+          var timeslot = result[k];
+          startHour = timeslot.startHour + ":" + timeslot.startMin;
+          endHour = timeslot.endHour + ":" + timeslot.endMin;
+          doctor =
+            timeslot.doc.firstName +
+            " " +
+            timeslot.doc.lastName +
+            " (AMKA: " +
+            timeslot.doc.amka +
+            ")";
+          var row = table.insertRow(-1);
+          var cell1 = row.insertCell(0);
+          var cell2 = row.insertCell(1);
+          var cell3 = row.insertCell(2);
+          cell1.innerHTML = startHour;
+          cell2.innerHTML = endHour;
+          cell3.innerHTML = doctor;
+        }
+      }
+      function getVaccinationCenters() {
+        console.log("We are inside getVaccinationCenters()");
+        var settings = {
+          url: "http://localhost:8080/getVaccinationCenters",
+          method: "GET",
+          timeout: 0,
+          processData: false,
+          mimeType: "multipart/form-data",
+          contentType: false,
+        };
+
+        $.ajax(settings).done(function (response) {
+          result = jQuery.parseJSON(response);
+          console.log(result);
+          //var table = document.getElementById("resultsTable");
+          var countriesDropDown = document.getElementById("VacCentersDropDown");
+          //var countriesData = {};
+          var i = 0;
+          for (var k in result) {
+            var vc = result[k];
+            var option = document.createElement("option");
+            option.setAttribute("value", vc.code);
+
+            var optionText = document.createTextNode(vc.address);
+            option.appendChild(optionText);
+            vacCentersDropDown.appendChild(option);
+            i++;
+          }
+        });
+      }
+      function insertAppointment() {
+        var selectedDate = document.getElementById("timeslot").value;
+        var vaccinationCenter =
+        document.getElementById("VacCentersDropDown").value;
+        //var startTime = document.getElementById("timeslotStartTime").value;
+        //var endTime = document.getElementById("timeslotEndTime").value;
+        //var vaccinationCenter =
+        document.getElementById("VacCentersDropDown").value;
+
+        var dateArray = String(selectedDate).split("-");
+        var year = dateArray[0];
+        var month = dateArray[1];
+        var day = dateArray[2];
+
+        var startHour = document.getElementById("startHour").value;
+        var startMin = document.getElementById("startMin").value;
+        var endtHour = document.getElementById("endHour").value;
+        var endMin = document.getElementById("endMin").value;
+
+        var docFirstName = document.getElementById("docfname").value;
+        var docLastName = document.getElementById("doclname").value;
+        var docAMKA = document.getElementById("docamka").value;
+
+        console.log("year: " + year);
+        console.log("month: " + month);
+        console.log("day: " + day);
+        console.log("startHour: " + startHour);
+        console.log("startMin: " + startMin);
+        console.log("endtHour: " + endtHour);
+        console.log("endMin: " + endMin);
+        console.log("docFirstName: " + docFirstName);
+        console.log("docLastName: " + docLastName);
+        console.log("docAMKA: " + docAMKA);
+
+        var settings = {
+          url: "http://localhost:8080/bookVaccination",
+          method: "POST",
+          timeout: 0,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          data: JSON.stringify({
+              day: day,
+              month: month,
+              year: year,
+              startHour: startHour,
+              startMin: startMin,
+              endHour: endtHour,
+              endMin: endMin,
+              vaccinationCenterCode: vaccinationCenter,
+              doc: {
+                amka: docAMKA,
+                firstName: docFirstName,
+                lastName: docLastName,
+              }
+          }),
+        };
+        $.ajax(settings).done(function (response) {
+          console.log("bookVaccination executed")
+        });
+      }
+      function updateAppointment() {
+        var selectedDate = document.getElementById("timeslot").value;
+        //var startTime = document.getElementById("timeslotStartTime").value;
+        //var endTime = document.getElementById("timeslotEndTime").value;
+        var vaccinationCenter =
+        document.getElementById("VacCentersDropDown").value;
+
+        var dateArray = String(selectedDate).split("-");
+        var year = dateArray[0];
+        var month = dateArray[1];
+        var day = dateArray[2];
+
+        var startHour = document.getElementById("startHour").value;
+        var startMin = document.getElementById("startMin").value;
+        var endtHour = document.getElementById("endHour").value;
+        var endMin = document.getElementById("endMin").value;
+
+        var docFirstName = document.getElementById("docfname").value;
+        var docLastName = document.getElementById("doclname").value;
+        var docAMKA = document.getElementById("docamka").value;
+
+        console.log("year: " + year);
+        console.log("month: " + month);
+        console.log("day: " + day);
+        console.log("startHour: " + startHour);
+        console.log("startMin: " + startMin);
+        console.log("endtHour: " + endtHour);
+        console.log("endMin: " + endMin);
+        console.log("docFirstName: " + docFirstName);
+        console.log("docLastName: " + docLastName);
+        console.log("docAMKA: " + docAMKA);
+
+        var settings = {
+          url: "http://localhost:8080/updateAppointment",
+          method: "POST",
+          timeout: 0,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          data: JSON.stringify( 
+            {
+              day: day,
+              month: month,
+              year: year,
+              startHour: startHour,
+              startMin: startMin,
+              endHour: endtHour,
+              endMin: endMin,
+              vaccinationCenterCode: vaccinationCenter,
+              doc: {
+                amka: docAMKA,
+                firstName: docFirstName,
+                lastName: docLastName,
+              }
+          }
+        ),
+        };
+        $.ajax(settings).done(function (response) {
+          console.log("UpdateVaccination executed")
+        });
+      }
+    </script>
+  </body>
+</html>
