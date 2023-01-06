@@ -88,42 +88,52 @@
           console.log("DAY: " + day);
         }
         var settings = {
-          url:
-            "http://localhost:8080/getAvailableTimeslots?day=" +
-            day +
-            "&month=" +
-            month +
-            "&year=" +
-            year +
-            "&vacCenterCode=" +
-            vaccinationCenter,
-          method: "GET",
-          timeout: 0,
-          processData: false,
-          mimeType: "multipart/form-data",
-          contentType: false,
-        };
+  "url": "http://localhost:8080/getAvailableTimeslots",
+  "method": "POST",
+  "timeout": 0,
+  "headers": {
+    "Content-Type": "application/json"
+  },
+  "data": JSON.stringify([
+    day,
+    month,
+    year,
+    vaccinationCenter
+  ]),
+};
 
-        $.ajax(settings).done(function (response) {
-          console.log(
-            "http://localhost:8080/getAvailableTimeslots?day=" +
-              day +
-              "&month=" +
-              month +
-              "&year=" +
-              year +
-              "&vacCenterCode=" +
-              vaccinationCenter
-          );
-          updateTable(response);
+
+
+        console.log("We try to find for:");
+        console.log("DAY: "+day);
+        console.log("DAY: "+day);
+        console.log("DAY: "+day);
+        console.log("DAY: "+day);
+
+      $.ajax(settings).done(function (response) {
+        updateTable(response);
         });
+
+       
       }
 
       function updateTable(json) {
         //if (!json) {
         //return;
         //}
-        result = jQuery.parseJSON(json);
+        console.log("--INSIDE UPDATE TABLE--");
+        console.log("RESPONSE");
+        console.log(json);
+        //try
+        //{
+          //result = jQuery.parseJSON(json);
+        //}catch(error)
+        //{
+          //console.log(error);
+        //}
+        result = json;
+      
+
         var table = document.getElementById("resultsTable");
 
         var rowCount = table.rows.length;

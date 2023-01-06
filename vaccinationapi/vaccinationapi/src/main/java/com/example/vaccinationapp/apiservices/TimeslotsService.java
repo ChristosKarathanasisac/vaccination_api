@@ -33,10 +33,7 @@ public class TimeslotsService {
 	{
 		System.out.println("We are inside getTimeslotsByDate");
 		VaccinationCenter vc = getVaccinationCenterByCode(vacCenterCode);
-		if(vc == null) 
-		{
-			return new ArrayList<Timeslot>();
-		}
+		
 		ArrayList<Timeslot> timeslotsFilteredByDate =new ArrayList<Timeslot>();
 		if(vc.getTimeslots() == null) 
 		{
@@ -128,5 +125,18 @@ public class TimeslotsService {
 			}
 		}
 		return false;
+	}
+	public ArrayList<Timeslot> getTimeslotsByMonth(String month,String year,String vacCenterCode)
+	{
+		VaccinationCenter vc = getVaccinationCenterByCode(vacCenterCode);
+		ArrayList<Timeslot> timeslotsFilteredByMonth =new ArrayList<Timeslot>();
+		for(Timeslot t:vc.getTimeslots()) 
+		{
+			if((t.getMonth().equals(month)) && (t.getYear().equals(year))) 
+			{
+				timeslotsFilteredByMonth.add(t);
+			}
+		}
+		return timeslotsFilteredByMonth;
 	}
 }

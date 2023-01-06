@@ -27,20 +27,36 @@ public class AppointmentsService {
 		ArrayList<Αppointment> appointmentsByDoc = new ArrayList<Αppointment>();
 		for(Αppointment a:this.appointments) 
 		{
-			if(a.getTimeslot().getDoc().getAmka().equals(doc.getAmka())) 
+			if(a.getTimeslot().getDoc().equals(doc))
 			{
 				appointmentsByDoc.add(a);
 			}
 		}
 		return appointmentsByDoc;
 	}
-	public ArrayList<Αppointment> getΑppointmentsByDay(Doctor doc,String day,String month,String year)
+	public ArrayList<Αppointment> getΑppointmentsByDoc(String docAMKA) 
 	{
 		if(this.appointments == null) 
 		{
 			return null;
 		}
-		ArrayList<Αppointment> appointmentsByDoc = getΑppointmentsByDoc(doc);
+		ArrayList<Αppointment> appointmentsByDoc = new ArrayList<Αppointment>();
+		for(Αppointment a:this.appointments) 
+		{
+			if(a.getTimeslot().getDoc().getAmka().equals(docAMKA))
+			{
+				appointmentsByDoc.add(a);
+			}
+		}
+		return appointmentsByDoc;
+	}
+	public ArrayList<Αppointment> getΑppointmentsByDay(String docAMKA,String day,String month,String year)
+	{
+		if(this.appointments == null) 
+		{
+			return null;
+		}
+		ArrayList<Αppointment> appointmentsByDoc = getΑppointmentsByDoc(docAMKA);
 		ArrayList<Αppointment> appointmentsByDay = new ArrayList<Αppointment>();
 		
 		for(Αppointment a:appointmentsByDoc) 
@@ -104,5 +120,16 @@ public class AppointmentsService {
 			}
 		}
 		return false;
+	}
+	public void removeAppointmentByCitizen(Citizen citizen) 
+	{
+		for(Αppointment a:this.appointments) 
+		{
+			if(a.getCitizen().equals(citizen)) 
+			{
+				this.appointments.remove(a);
+				return;
+			}
+		}
 	}
 }

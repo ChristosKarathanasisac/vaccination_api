@@ -15,6 +15,7 @@ import com.example.vaccinationapp.apiservices.*;
 import com.example.vaccinationapp.entities.*;
 
 
+
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @SpringBootApplication(scanBasePackages={
@@ -25,6 +26,8 @@ public class VaccinationController {
 	private TimeslotsService  timeslotService;
 	@Autowired
 	private AppointmentsService  appointmentsService;
+	@Autowired
+	private VaccinationService  vaccinationService;
 	
 	
 	////////////////////////////FOR TEST ONLY//////////////////////////////////////////////
@@ -35,15 +38,13 @@ public class VaccinationController {
 	public void intapp()  throws Exception{
 		appointmentsService.InitServiceForTestOnly();
 		timeslotService.InitServiceForTestOnly();
+		vaccinationService.InitServiceForTestOnly();
 		return;
 	} 
    ////////////////////////////////////////////////////////////////////////////////////
-	
-	
-	//http://localhost:8080/getAvailableTimeslots?day=09&month=01&year=2023&vacCenterCode=001
-	//SHOULD I DO AND THIS POST????
-	@GetMapping(path="/getAvailableTimeslots")
-	public ArrayList<Timeslot> getAvailableTimeslots(@RequestParam(value="day") String day,
+	//http://localhost:8080/getAvailableTimeslots?day=07&month=01&year=2023&vacCenterCode=001
+	/*@GetMapping(path="/getAvailableTimeslotsTest")
+	public ArrayList<Timeslot> getAvailableTimeslotsTest(@RequestParam(value="day") String day,
 			@RequestParam(value="month") String month,
 			@RequestParam(value="year") String year,
 			@RequestParam(value="vacCenterCode") String vacCenterCode)  throws Exception{
@@ -55,6 +56,19 @@ public class VaccinationController {
 		ArrayList<Timeslot> test = this.timeslotService.getTimeslotsByDate(day.trim(),month.trim(),year.trim(),vacCenterCode);
 		System.out.println("It will return: "+test.size());
 		return test;
+	} */
+	
+	@PostMapping(path="/getAvailableTimeslots")
+	public ArrayList<Timeslot> getAvailableTimeslots(@RequestBody String[] searchFilters)  throws Exception{
+		ArrayList<Timeslot> test = this.timeslotService.getTimeslotsByDate(searchFilters[0].trim(),searchFilters[1].trim(),
+				searchFilters[2].trim(),searchFilters[3].trim());
+		System.out.println("It will return: "+test.size());
+		return test;
+	} 
+	@PostMapping(path="/getAvailableTimeslotsByMonth")
+	public ArrayList<Timeslot> getAvailableTimeslotsByMonth(@RequestBody String[] searchFilters)  throws Exception{
+		return this.timeslotService.getTimeslotsByMonth(searchFilters[0].trim(),searchFilters[1].trim(),
+				searchFilters[2].trim());
 	} 
 	
 	@GetMapping(path="/getVaccinationCenters")
@@ -83,15 +97,24 @@ public class VaccinationController {
 		return;
 		
 	} 
-	@GetMapping(path="/showVaccinationStatus")
-	public String showVaccinationStatus()  throws Exception{
-		return "";
+	@PostMapping(path="/showVaccinationStatus")
+	public Vaccination showVaccinationStatus(@RequestBody Citizen citizen)  throws Exception{
+		if(citizen!=null) 
+		{
+			return this.vaccinationService.getVaccinationByCitizen(citizen);
+		}
+		return null;
 	} 
 	@PostMapping(path="/bookVaccination")
 	public void bookVaccination(@RequestBody Timeslot timeslot)  throws Exception{
 		System.out.println("Inside bookVaccination");
 		//I will probably have the citizens's data from LOGIN
 		Citizen citizen = new Citizen("123456789","Kostas","Papadopoulos","987654321","pap@gmail.com");
+		if(this.vaccinationService.getVaccinationByCitizen(citizen) !=null) 
+		{
+			System.out.println("The citizen is Vaccinated");
+			return;
+		}
 		if(timeslot ==null) 
 		{
 			System.out.println("Timeslot was null");
@@ -105,17 +128,41 @@ public class VaccinationController {
 		appointmentsService.addΑppointment(appointment);
 		timeslotService.removeTimeslot(timeslot);
 		
-		
 	} 
 	//localhost:8080/getAppointments
-	@GetMapping(path="/getAppointments")
-	public ArrayList<Αppointment> getAppointments()  throws Exception{
-		return appointmentsService.getΑppointments();
+	@PostMapping(path="/getAppointments")
+	public ArrayList<Αppointment> getAppointments(@RequestBody Doctor doc)  throws Exception{
+		if(!(doc==null))
+		{
+			return appointmentsService.getΑppointmentsByDoc(doc);
+		}else 
+		{
+			System.out.println("doc was null");
+			return null;
+		}
+		
+	} 
+	@PostMapping(path="/getAppointmentsByDay")
+	public ArrayList<Αppointment> getAppointments(@RequestBody String[] searchFilters)  throws Exception{
+		if(!(searchFilters==null))
+		{
+			String day = searchFilters[0];
+			String month = searchFilters[1];
+			String year = searchFilters[2];
+			String docAMKA = searchFilters[3];
+			return appointmentsService.getΑppointmentsByDay(docAMKA, day, month, year);
+		}else 
+		{
+			System.out.println("doc was null");
+			return null;
+		}
+		
 	} 
 	
-	@GetMapping(path="/insertVaccination")
-	public String insertVaccination()  throws Exception{
-		return "";
+	@PostMapping(path="/insertVaccination")
+	public void insertVaccination(@RequestBody Vaccination vaccination)  throws Exception{
+		this.appointmentsService.removeAppointmentByCitizen(vaccination.getCitizen());
+		this.vaccinationService.addVaccination(vaccination);
 	} 
 	//http://localhost:8080/insertTimeSlot?day=1&hour=11&minute=30
 	@PostMapping(path="/insertTimeSlot")
