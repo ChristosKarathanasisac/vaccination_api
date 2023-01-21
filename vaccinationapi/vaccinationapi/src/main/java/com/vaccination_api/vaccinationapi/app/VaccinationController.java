@@ -1,9 +1,13 @@
 package com.vaccination_api.vaccinationapi.app;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,17 +15,25 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.vaccinationapp.apiservices.*;
+import com.example.vaccinationapp.apiservices.AppointmentsService;
+import com.example.vaccinationapp.apiservices.TimeslotsService;
+import com.example.vaccinationapp.apiservices.VaccinationService;
 import com.example.vaccinationapp.entities.*;
 
 
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@SpringBootApplication(scanBasePackages={
-"com.example.vaccinationapp.apiservices", "com.vaccination_api.vaccinationapi"})
+@ComponentScan(basePackages = { "com.example.vaccinationapp.*" })
+@EntityScan("com.example.vaccinationapp.*")   
+@EnableJpaRepositories(basePackages={
+"com.example.vaccinationapp.repositories"})
 public class VaccinationController {
 	//private User user;
+	//@SpringBootApplication(scanBasePackages={
+	//"com.example.vaccinationapp.apiservices", "com.vaccination_api.vaccinationapi"})
+	
+	
 	@Autowired
 	private TimeslotsService  timeslotService;
 	@Autowired
@@ -30,49 +42,46 @@ public class VaccinationController {
 	private VaccinationService  vaccinationService;
 	
 	
-	////////////////////////////FOR TEST ONLY//////////////////////////////////////////////
-	///////////////////////WE SHOULD RUN THIS BEFORE DO ANYTHING///////////////////////////
-	
-	//http://localhost:8080/init
-	@GetMapping(path="/init")
-	public void intapp()  throws Exception{
-		appointmentsService.InitServiceForTestOnly();
-		timeslotService.InitServiceForTestOnly();
-		vaccinationService.InitServiceForTestOnly();
-		return;
-	} 
-   ////////////////////////////////////////////////////////////////////////////////////
-	//http://localhost:8080/getAvailableTimeslots?day=07&month=01&year=2023&vacCenterCode=001
-	/*@GetMapping(path="/getAvailableTimeslotsTest")
+	@GetMapping(path="/getAvailableTimeslots")
 	public ArrayList<Timeslot> getAvailableTimeslotsTest(@RequestParam(value="day") String day,
 			@RequestParam(value="month") String month,
 			@RequestParam(value="year") String year,
 			@RequestParam(value="vacCenterCode") String vacCenterCode)  throws Exception{
-		System.out.println("We search for: ");
-		System.out.println("Vaccination Center: "+vacCenterCode);
-		System.out.println("day: "+day);
-		System.out.println("month: "+month);
-		System.out.println("year: "+year);
-		ArrayList<Timeslot> test = this.timeslotService.getTimeslotsByDate(day.trim(),month.trim(),year.trim(),vacCenterCode);
-		System.out.println("It will return: "+test.size());
-		return test;
-	} */
+		
+		if(month == null || year==null || day ==null || vacCenterCode==null) 
+		{
+			return null;
+		}
+		ArrayList<Timeslot> tmslots = this.timeslotService.getTimeslotsByDate(day.trim(),month.trim(),year.trim(),vacCenterCode);
+		return tmslots;
+	} 
 	
-	@PostMapping(path="/getAvailableTimeslots")
+	/*@PostMapping(path="/getAvailableTimeslots")
 	public ArrayList<Timeslot> getAvailableTimeslots(@RequestBody String[] searchFilters)  throws Exception{
 		ArrayList<Timeslot> test = this.timeslotService.getTimeslotsByDate(searchFilters[0].trim(),searchFilters[1].trim(),
 				searchFilters[2].trim(),searchFilters[3].trim());
-		System.out.println("It will return: "+test.size());
+		//System.out.println("It will return: "+test.size());
 		return test;
-	} 
-	@PostMapping(path="/getAvailableTimeslotsByMonth")
+	} */
+	/*@PostMapping(path="/getAvailableTimeslotsByMonth")
 	public ArrayList<Timeslot> getAvailableTimeslotsByMonth(@RequestBody String[] searchFilters)  throws Exception{
 		return this.timeslotService.getTimeslotsByMonth(searchFilters[0].trim(),searchFilters[1].trim(),
 				searchFilters[2].trim());
-	} 
+	}*/ 
+	@GetMapping(path="/getAvailableTimeslotsByMonth")
+	public ArrayList<Timeslot> getAvailableTimeslotsByMonth(@RequestParam(value="month") String month,
+			@RequestParam(value="year") String year,
+			@RequestParam(value="vacCenterCode") String vacCenterCode)  throws Exception{
+		if(month == null || year==null  || vacCenterCode==null) 
+		{
+			return null;
+		}
+		return this.timeslotService.getTimeslotsByMonth(month,year,
+				vacCenterCode);
+	}
 	
 	@GetMapping(path="/getVaccinationCenters")
-	public ArrayList<VaccinationCenter> getVaccinationCenters()  throws Exception{
+	public List<VaccinationCenter> getVaccinationCenters()  throws Exception{
 		return timeslotService.getAllVaccinationCenters();
 	} 
 	
@@ -167,44 +176,11 @@ public class VaccinationController {
 	//http://localhost:8080/insertTimeSlot?day=1&hour=11&minute=30
 	@PostMapping(path="/insertTimeSlot")
 	public void insertTimeSlot(@RequestBody Timeslot timeslot)  throws Exception{
-		//We should get doctor by login!!
-		//Doctor d = new Doctor("11029711111","Christos","Karathanasis");
-		//Timeslot timeslot = req.getTimeslot();
-		//String vaccinationCenterCode = req.getVaccinationCenterCode();
-		//if((timeslot==null)||(vaccinationCenterCode==null)||(vaccinationCenterCode.isBlank())) 
 		if((timeslot==null)) 
 		{
 			System.out.println("Problem in request");
 		}
-		//timeslot.setDoc(d);
+		timeslot.createId();
 		this.timeslotService.addTimeslot(timeslot);
 	} 
-	
-	    //http://localhost:8080/insertTimeSlot?day=06&month=01&year=2023&startHour=09&startMinute=00&endHour=09&endMinute=30&vacCenterCode=001
-		/*@GetMapping(path="/insertTimeSlot")
-		public void insertTimeSlot(@RequestParam(value="day") String day,
-				@RequestParam(value="month") String month,
-				@RequestParam(value="year") String year,
-				@RequestParam(value="startHour") String startHour,
-				@RequestParam(value="startMinute") String startMinute,
-				@RequestParam(value="endHour") String endHour,
-				@RequestParam(value="endMinute") String endMinute,
-				@RequestParam(value="vacCenterCode") String vacCenterCode)  throws Exception{
-			//For Test////////////////////////////////
-			System.out.println("We are inside insertTimeSlot");
-			Doctor d = new Doctor("11029711111","Christos","Karathanasis");
-			Timeslot t = new Timeslot(day,month,year,startHour,startMinute,endHour,endMinute,d);
-			System.out.println("Timeslot Created: ");
-			System.out.println(day);
-			System.out.println(month);
-			System.out.println(year);
-			System.out.println(startHour);
-			System.out.println(startMinute);
-			System.out.println(endHour);
-			System.out.println(endMinute);
-			System.out.println("Vaccination Center: "+vacCenterCode);
-			///////////////////////////////////////////
-			this.timeslotService.addTimeslot(t,vacCenterCode);
-		} 
-*/
 }

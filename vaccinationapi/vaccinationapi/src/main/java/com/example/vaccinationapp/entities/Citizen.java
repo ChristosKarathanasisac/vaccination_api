@@ -1,13 +1,56 @@
 package com.example.vaccinationapp.entities;
 
-public class Citizen extends User {
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+@Entity
+public class Citizen {
+	@Id
+	private String amka;
+	private String firstName;
+	private String lastName;
 	private String afm;
 	private String email;
 	
-	public Citizen(String amka, String firstName, String lastName,String afm,String email) {
-		super(amka, firstName, lastName);
+	public Citizen() {
+		
+	}
+
+	
+
+	public Citizen(String amka, String firstName, String lastName, String afm, String email) {
+		super();
+		this.amka = amka;
+		this.firstName = firstName;
+		this.lastName = lastName;
 		this.afm = afm;
 		this.email = email;
+	}
+
+
+
+	public String getAmka() {
+		return amka;
+	}
+
+	public void setAmka(String amka) {
+		this.amka = amka;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 
 	public String getAfm() {

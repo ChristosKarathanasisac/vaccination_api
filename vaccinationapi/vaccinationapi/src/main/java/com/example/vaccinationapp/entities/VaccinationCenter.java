@@ -1,17 +1,25 @@
 package com.example.vaccinationapp.entities;
 
-import java.util.ArrayList;
+import java.util.*;
 
+import javax.persistence.*;
+@Entity
 public class VaccinationCenter {
+	@Id
 	private String code;
 	private String address;
-	private ArrayList<Timeslot> timeslots;
+	@OneToMany(mappedBy="id", cascade= CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<Timeslot> timeslots;
 	
 	public VaccinationCenter(String code, String address) {
 		super();
 		this.code = code;
 		this.address = address;
 		this.timeslots = new ArrayList<Timeslot>(); 
+	}
+	
+	public VaccinationCenter() {
+		
 	}
 	public String getCode() {
 		return code;
@@ -25,12 +33,15 @@ public class VaccinationCenter {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-	public ArrayList<Timeslot> getTimeslots() {
+
+	public List<Timeslot> getTimeslots() {
 		return timeslots;
 	}
-	public void setTimeslots(ArrayList<Timeslot> timeslots) {
+
+	public void setTimeslots(List<Timeslot> timeslots) {
 		this.timeslots = timeslots;
 	}
+	
 	public void addTimeslot(Timeslot t) 
 	{
 		this.timeslots.add(t);

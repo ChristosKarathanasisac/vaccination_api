@@ -1,23 +1,87 @@
 package com.example.vaccinationapp.entities;
+import java.util.*;
 
-import java.util.ArrayList;
-
-public class Doctor extends User {
-	private ArrayList<Timeslot> timeslots;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+@Entity
+public class Doctor {
+	@Id
+	private String amka;
+	private String firstName;
+	private String lastName;
+	@OneToMany(mappedBy="id", cascade= CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<Timeslot> timeslots;
 
 	
 
+	
 	public Doctor(String amka, String firstName, String lastName) {
-		super(amka, firstName, lastName);
+		super();
+		this.amka = amka;
+		this.firstName = firstName;
+		this.lastName = lastName;
 		this.timeslots = new ArrayList<Timeslot>();
 	}
 
-	public ArrayList<Timeslot> getTimeslots() {
+
+
+	public Doctor() {
+		
+	}
+
+
+
+	public String getAmka() {
+		return amka;
+	}
+
+
+
+	public void setAmka(String amka) {
+		this.amka = amka;
+	}
+
+
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+
+
+	public String getLastName() {
+		return lastName;
+	}
+
+
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+
+
+	public List<Timeslot> getTimeslots() {
 		return timeslots;
 	}
 
-	public void setTimeslots(ArrayList<Timeslot> timeslots) {
+
+
+	public void setTimeslots(List<Timeslot> timeslots) {
 		this.timeslots = timeslots;
+	}
+
+	public void addTimeslot(Timeslot t) {
+		this.timeslots.add(t);
 	}
 
 	
