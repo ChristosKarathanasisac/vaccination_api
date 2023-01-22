@@ -2,28 +2,28 @@ package com.example.vaccinationapp.apiservices;
 
 import java.util.ArrayList;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.vaccinationapp.entities.Citizen;
 import com.example.vaccinationapp.entities.Vaccination;
+import com.example.vaccinationapp.repositories.VaccinationRepository;
 
 @Service
 public class VaccinationService {
-ArrayList<Vaccination> vaccinations;
+@Autowired
+VaccinationRepository vaccinationRepository;
 
-public void InitServiceForTestOnly() 
-{
-	this.vaccinations = new ArrayList<Vaccination>();
-}
+
 public void addVaccination(Vaccination vaccination) 
 {
-	this.vaccinations.add(vaccination);
+	vaccinationRepository.save(vaccination);
 }
-public Vaccination getVaccinationByCitizen(Citizen citizen) 
+public Vaccination getVaccinationByCitizen(String amka) 
 {
-	for(Vaccination v:this.vaccinations) 
+	for(Vaccination v:vaccinationRepository.findAll()) 
 	{
-		if(v.getCitizen().equals(citizen)) 
+		if(v.getCitizen().getAmka().equals(amka)) 
 		{
 			return v;
 		}
@@ -31,7 +31,7 @@ public Vaccination getVaccinationByCitizen(Citizen citizen)
 	return null;
 	
 }
-public boolean checkIfVaccinationExist(Vaccination vaccination) 
+/*public boolean checkIfVaccinationExist(Vaccination vaccination) 
 {
 	for(Vaccination v:this.vaccinations) 
 	{
@@ -41,5 +41,5 @@ public boolean checkIfVaccinationExist(Vaccination vaccination)
 		}
 	}
 	return false;
-}
+}*/
 }

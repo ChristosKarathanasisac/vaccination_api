@@ -2,9 +2,22 @@ package com.example.vaccinationapp.entities;
 
 import java.util.Date;
 
+import javax.persistence.*;
+@Entity
 public class Vaccination {
+	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id",unique=true)
+	private Long id;
+	
+	@OneToOne(cascade= CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "citizen",referencedColumnName = "amka")
 	private Citizen citizen;
+	
+	@ManyToOne
+	@JoinColumn(name="doctor_amka")
 	private Doctor doctor;
+	
 	private Date vaccinationDate;
 	private Date vaccinationEndDate;
 	
@@ -15,6 +28,8 @@ public class Vaccination {
 		this.doctor = doctor;
 		this.vaccinationDate = vaccinationDate;
 		this.vaccinationEndDate = vaccinationEndDate;
+	}
+	public Vaccination() {
 	}
 	public Citizen getCitizen() {
 		return citizen;

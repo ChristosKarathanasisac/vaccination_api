@@ -1,5 +1,7 @@
 package com.example.vaccinationapp.apiservices;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,27 @@ public class ApplicationService {
 	public void addCitizen(Citizen c) 
 	{
 		citizenRepository.save(c);
+	}
+	
+	public Citizen getCitizenByAMKA(String amka) 
+	{
+		Optional<Citizen> byId = citizenRepository.findById(amka);
+		if(byId.isPresent()) 
+		{
+			return byId.get();
+		}
+		return null;
+			
+	}
+	public Doctor getDoctorByAMKA(String amka) 
+	{
+		Optional<Doctor> byId = doctorRepository.findById(amka);
+		if(byId.isPresent()) 
+		{
+			return byId.get();
+		}
+		return null;
+			
 	}
 
 }

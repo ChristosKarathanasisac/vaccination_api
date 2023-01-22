@@ -14,7 +14,7 @@ public class ServiceConfig implements CommandLineRunner{
 
 	@Override
 	public void run(String... args) throws Exception {
-		/*VaccinationCenter vc1 = new VaccinationCenter("001","Thessaloniki");
+		VaccinationCenter vc1 = new VaccinationCenter("001","Thessaloniki");
 		VaccinationCenter vc2 = new VaccinationCenter("002","Athens");
 		appService.addVaccinationCenter(vc1);
 		appService.addVaccinationCenter(vc2);
@@ -33,6 +33,7 @@ public class ServiceConfig implements CommandLineRunner{
 		Citizen c2 = new Citizen("31129001278", "Dimitris", "Pasxos", "987654321","dim@gmail.com");
 		appService.addCitizen(c1);
 		appService.addCitizen(c2);
-		*/
+		
 	}
+	
 }

@@ -1,31 +1,28 @@
 package com.example.vaccinationapp.apiservices;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.vaccinationapp.entities.*;
+import com.example.vaccinationapp.repositories.ΑppointmentRepository;
 
 @Service
 public class AppointmentsService {
-	ArrayList<Αppointment> appointments;
+	//ArrayList<Αppointment> appointments;
+	@Autowired
+	ΑppointmentRepository appointmentRepository;
 	
-	public void InitServiceForTestOnly() 
+	public List<Αppointment> getΑppointments() 
 	{
-		this.appointments = new ArrayList<Αppointment>();
-	}
-	public ArrayList<Αppointment> getΑppointments() 
-	{
-		return this.appointments;
+		return appointmentRepository.findAll();
 	}
 	public ArrayList<Αppointment> getΑppointmentsByDoc(Doctor doc) 
 	{
-		if(this.appointments == null) 
-		{
-			return null;
-		}
 		ArrayList<Αppointment> appointmentsByDoc = new ArrayList<Αppointment>();
-		for(Αppointment a:this.appointments) 
+		for(Αppointment a:appointmentRepository.findAll()) 
 		{
 			if(a.getTimeslot().getDoc().equals(doc))
 			{
@@ -36,12 +33,8 @@ public class AppointmentsService {
 	}
 	public ArrayList<Αppointment> getΑppointmentsByDoc(String docAMKA) 
 	{
-		if(this.appointments == null) 
-		{
-			return null;
-		}
 		ArrayList<Αppointment> appointmentsByDoc = new ArrayList<Αppointment>();
-		for(Αppointment a:this.appointments) 
+		for(Αppointment a:appointmentRepository.findAll()) 
 		{
 			if(a.getTimeslot().getDoc().getAmka().equals(docAMKA))
 			{
@@ -52,14 +45,10 @@ public class AppointmentsService {
 	}
 	public ArrayList<Αppointment> getΑppointmentsByDay(String docAMKA,String day,String month,String year)
 	{
-		if(this.appointments == null) 
-		{
-			return null;
-		}
-		ArrayList<Αppointment> appointmentsByDoc = getΑppointmentsByDoc(docAMKA);
+		//ArrayList<Αppointment> appointmentsByDoc = getΑppointmentsByDoc(docAMKA);
 		ArrayList<Αppointment> appointmentsByDay = new ArrayList<Αppointment>();
 		
-		for(Αppointment a:appointmentsByDoc) 
+		for(Αppointment a:appointmentRepository.findAll()) 
 		{
 			if(a.getTimeslot().getDay().equals(day) && a.getTimeslot().getMonth().equals(month) && 
 					a.getTimeslot().getYear().equals(year))
@@ -73,28 +62,24 @@ public class AppointmentsService {
 	
 	public void addΑppointment(Αppointment appointment) 
 	{
-		System.out.println("inside addΑppointment");
-		if(this.appointments==null) 
-		{
-			System.out.println("appointments was null");
-		}
-		this.appointments.add(appointment);
-		System.out.println("Αppointment added");
+		appointmentRepository.save(appointment);
 	}
 	public AppointmentsService() {
 		super();
 	}
-	public void removeΑppointment(Αppointment appointment) 
+	public boolean removeΑppointment(Long id) 
 	{
-		if(this.appointments.contains(appointment)) 
+		if(appointmentRepository.findById(id) !=null) 
 		{
-			this.appointments.remove(appointment);
+			appointmentRepository.deleteById(id);
+			return true;
 		}
+		return false;
 	}
 	public Timeslot updateAppointment(Αppointment newΑppointment) 
 	{
 		Timeslot oldTimeslot;
-		for(Αppointment a:this.appointments) 
+		for(Αppointment a:appointmentRepository.findAll()) 
 		{
 			if(a.getCitizen().equals(newΑppointment.getCitizen())) 
 			{
@@ -110,26 +95,16 @@ public class AppointmentsService {
 		}
 		return null;
 	}
-	public boolean checkIfCitizenHasAppointment(Citizen citizen) 
+	public Αppointment getAppointmentByCitizen(String amka) 
 	{
-		for(Αppointment a:this.appointments) 
+		for(Αppointment a:appointmentRepository.findAll()) 
 		{
-			if(a.getCitizen().equals(citizen)) 
+			if(a.getCitizen().getAmka().equals(amka)) 
 			{
-				return true;
+				return a;
 			}
 		}
-		return false;
+		return null;
 	}
-	public void removeAppointmentByCitizen(Citizen citizen) 
-	{
-		for(Αppointment a:this.appointments) 
-		{
-			if(a.getCitizen().equals(citizen)) 
-			{
-				this.appointments.remove(a);
-				return;
-			}
-		}
-	}
+	
 }

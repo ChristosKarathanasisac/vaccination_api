@@ -1,13 +1,19 @@
 package com.example.vaccinationapp.entities;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 @Entity
 public class Timeslot {
 	@Id
-	private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id",unique=true)
+	private Long id;
 	private String day;
 	private String month;
 	private String year;
@@ -22,12 +28,13 @@ public class Timeslot {
 	@ManyToOne
 	@JoinColumn(name="doctor_amka")
 	private Doctor doc;
-	
+	@OneToOne(mappedBy = "timeslot")
+	private Αppointment appointment;
 	
 	public Timeslot() {
 		
 	}
-	public String getId() {
+	public Long getId() {
 		return id;
 	}
 	
@@ -89,6 +96,9 @@ public class Timeslot {
 		this.vacCenter.setCode(vacCenterCode);
 	}
 	
+	public Αppointment getAppointment() {
+		return appointment;
+	}
 	public boolean isAvailable() {
 		return available;
 	}
@@ -111,10 +121,10 @@ public class Timeslot {
 		//this.id = vCenter.getCode()+doctor.getAmka()+day+month+year+startHour+startMin;
 	}
 	
-	public void createId() 
+	/*public void createId() 
 	{
 		this.id = this.vacCenter.getCode()+this.doc.getAmka()+day+month+year+startHour+startMin;
-	}
+	}*/
 	
 	@Override
 	public boolean equals(Object o) {

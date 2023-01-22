@@ -1,7 +1,11 @@
 package com.example.vaccinationapp.entities;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 
 @Entity
 public class Citizen {
@@ -11,6 +15,12 @@ public class Citizen {
 	private String lastName;
 	private String afm;
 	private String email;
+	
+	@OneToOne(mappedBy = "citizen",cascade= CascadeType.ALL, fetch = FetchType.LAZY)
+	private Αppointment appointment;
+	
+	@OneToOne(mappedBy = "citizen",cascade= CascadeType.ALL, fetch = FetchType.LAZY)
+	private Vaccination vaccination;
 	
 	public Citizen() {
 		
@@ -67,6 +77,18 @@ public class Citizen {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+
+
+	public Αppointment getAppointment() {
+		return appointment;
+	}
+
+
+
+	public Vaccination getVaccination() {
+		return vaccination;
 	}
 
 }

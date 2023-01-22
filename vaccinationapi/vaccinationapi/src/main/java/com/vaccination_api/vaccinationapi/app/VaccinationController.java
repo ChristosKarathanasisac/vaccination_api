@@ -3,6 +3,7 @@ package com.vaccination_api.vaccinationapi.app;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -15,10 +16,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.vaccinationapp.apiservices.ApplicationService;
 import com.example.vaccinationapp.apiservices.AppointmentsService;
 import com.example.vaccinationapp.apiservices.TimeslotsService;
 import com.example.vaccinationapp.apiservices.VaccinationService;
 import com.example.vaccinationapp.entities.*;
+import com.example.vaccinationapp.requestclasses.RequestBookVaccination;
+import com.example.vaccinationapp.requestclasses.RequestInsertVaccination;
+import com.example.vaccinationapp.responseclasses.Response;
 
 
 
@@ -40,7 +45,8 @@ public class VaccinationController {
 	private AppointmentsService  appointmentsService;
 	@Autowired
 	private VaccinationService  vaccinationService;
-	
+	@Autowired
+	private ApplicationService applicationService;
 	
 	@GetMapping(path="/getAvailableTimeslots")
 	public ArrayList<Timeslot> getAvailableTimeslotsTest(@RequestParam(value="day") String day,
@@ -82,7 +88,8 @@ public class VaccinationController {
 	
 	@GetMapping(path="/getVaccinationCenters")
 	public List<VaccinationCenter> getVaccinationCenters()  throws Exception{
-		return timeslotService.getAllVaccinationCenters();
+		//return timeslotService.getAllVaccinationCenters();
+		return null;
 	} 
 	
 	//@GetMapping(path="/bookVaccination")
@@ -93,7 +100,7 @@ public class VaccinationController {
 	public void changeAppointment(@RequestBody Timeslot timeslot)  throws Exception{
 		//Timeslot timeslot = req.getTimeslot();
 		//String vaccinationCenterCode = req.getVaccinationCenterCode();
-		Citizen citizen = new Citizen("123456789","Kostas","Papadopoulos","987654321","pap@gmail.com");
+		/*Citizen citizen = new Citizen("123456789","Kostas","Papadopoulos","987654321","pap@gmail.com");
 		if(!appointmentsService.checkIfCitizenHasAppointment(citizen)) 
 		{
 			return;
@@ -103,39 +110,55 @@ public class VaccinationController {
 		timeslotService.removeTimeslot(timeslot);
 		if(oldtimeslot==null) {return;}
 		timeslotService.addTimeslot(oldtimeslot);
-		return;
+		return;*/
 		
 	} 
 	@PostMapping(path="/showVaccinationStatus")
 	public Vaccination showVaccinationStatus(@RequestBody Citizen citizen)  throws Exception{
 		if(citizen!=null) 
 		{
-			return this.vaccinationService.getVaccinationByCitizen(citizen);
+			//return this.vaccinationService.getVaccinationByCitizen(citizen);
 		}
 		return null;
 	} 
 	@PostMapping(path="/bookVaccination")
-	public void bookVaccination(@RequestBody Timeslot timeslot)  throws Exception{
-		System.out.println("Inside bookVaccination");
-		//I will probably have the citizens's data from LOGIN
-		Citizen citizen = new Citizen("123456789","Kostas","Papadopoulos","987654321","pap@gmail.com");
-		if(this.vaccinationService.getVaccinationByCitizen(citizen) !=null) 
+	public Response bookVaccination(@RequestBody RequestBookVaccination r)  throws Exception{
+		Response resp = new Response();
+		Citizen citizen = applicationService.getCitizenByAMKA(r.getCitizen_amka());
+		if(citizen==null) 
 		{
-			System.out.println("The citizen is Vaccinated");
-			return;
+			resp.setStatus("ERROR");
+			resp.setWarningMessage("Missing Citizen. The Citizen was not Registered.");
+			return resp;
 		}
-		if(timeslot ==null) 
+		Timeslot ts = timeslotService.getTimeslotById(r.getTmslot_id());
+		
+		if(ts==null) 
 		{
-			System.out.println("Timeslot was null");
+			resp.setStatus("ERROR");
+			resp.setWarningMessage("Missing Timeslot. Wrong timeslot id");
+			return resp;
 		}
-		if(appointmentsService.checkIfCitizenHasAppointment(citizen)) 
+		if(this.vaccinationService.getVaccinationByCitizen(r.getCitizen_amka()) !=null) 
 		{
-			return;
+			resp.setStatus("ERROR");
+			resp.setWarningMessage("Citizen is Vaccinated");
+			return resp;
 		}
-		Αppointment appointment = new Αppointment(citizen,timeslot);
+		
+		if(appointmentsService.getAppointmentByCitizen(r.getCitizen_amka()) !=null) 
+		{
+			resp.setStatus("ERROR");
+			resp.setWarningMessage("Citizen has already Appointment.");
+			return resp;
+		}
+		Αppointment appointment = new Αppointment(citizen,ts);
 		
 		appointmentsService.addΑppointment(appointment);
-		timeslotService.removeTimeslot(timeslot);
+		timeslotService.updateTimesotStatus(ts.getId(), false);
+		resp.setStatus("SUCCESS");
+		resp.setResultmsg("Appointment added!");
+		return resp;
 		
 	} 
 	//localhost:8080/getAppointments
@@ -169,9 +192,58 @@ public class VaccinationController {
 	} 
 	
 	@PostMapping(path="/insertVaccination")
-	public void insertVaccination(@RequestBody Vaccination vaccination)  throws Exception{
-		this.appointmentsService.removeAppointmentByCitizen(vaccination.getCitizen());
-		this.vaccinationService.addVaccination(vaccination);
+	public Response insertVaccination(@RequestBody RequestInsertVaccination r)  throws Exception{
+		Response resp = new Response();
+		
+		//Input Checks
+		Doctor doctor = applicationService.getDoctorByAMKA(r.getDoctorAMKA());
+		if(doctor==null) 
+		{
+			resp.setStatus("ERROR");
+			resp.setWarningMessage("The Doctor was not Registered");
+			return resp;
+		}
+		Citizen citizen = applicationService.getCitizenByAMKA(r.getCitizenAMKA());
+		if(citizen==null) 
+		{
+			resp.setStatus("ERROR");
+			resp.setWarningMessage("The Citizen was not Registered");
+			return resp;
+		}
+		
+		//Add Vaccination
+		Vaccination vac = new Vaccination(citizen,doctor,r.getDate(),DateUtils.addMonths(r.getDate(), 6));
+		vaccinationService.addVaccination(vac);
+		
+		//Delete Timeslot and Appointment
+		Αppointment appointmentToDelete = appointmentsService.getAppointmentByCitizen(r.getCitizenAMKA());
+		if(appointmentToDelete ==null) 
+		{
+			resp.setStatus("ERROR");
+			resp.setResultmsg("Dont find appointmentToDelete");
+			return resp;
+		}
+		if(!timeslotService.removeTimeslot(appointmentToDelete.getTimeslot().getId())) 
+		{
+			resp.setStatus("ERROR");
+			resp.setResultmsg("Dont find timeslotToDelete");
+			return resp;
+		}
+		if(!appointmentsService.removeΑppointment(appointmentToDelete.getId())) 
+		{
+			resp.setStatus("ERROR");
+			resp.setResultmsg("Dont find appointmentToDelete");
+			return resp;
+		}
+		
+		
+		
+		//timeslotService.removeTimeslot(appointmentToDelete.getTimeslot().getId());
+		
+		
+		resp.setStatus("SUCCESS");
+		resp.setResultmsg("Vaccination Added");
+		return resp;
 	} 
 	//http://localhost:8080/insertTimeSlot?day=1&hour=11&minute=30
 	@PostMapping(path="/insertTimeSlot")
@@ -180,7 +252,7 @@ public class VaccinationController {
 		{
 			System.out.println("Problem in request");
 		}
-		timeslot.createId();
+		//timeslot.createId();
 		this.timeslotService.addTimeslot(timeslot);
 	} 
 }

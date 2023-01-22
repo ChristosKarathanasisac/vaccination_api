@@ -2,6 +2,7 @@ package com.example.vaccinationapp.apiservices;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.hibernate.criterion.Example;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,6 @@ import com.example.vaccinationapp.repositories.VaccinationCenterRepository;
 
 @Service
 public class TimeslotsService {
-	private TimeslotRepository timeslotRepository2;
 	@Autowired
 	TimeslotRepository timeslotRepository;
 	public TimeslotsService() {
@@ -42,45 +42,16 @@ public class TimeslotsService {
 		timeslotRepository.save(timeslot);
 		System.out.println("Timeslot Added");
 	}
-	public List<VaccinationCenter> getAllVaccinationCenters()
+	
+	
+	public boolean removeTimeslot(Long id) 
 	{
-		/*if(this.vaccinationCenters==null) 
+		if(timeslotRepository.findById(id)!=null) 
 		{
-			return new ArrayList<VaccinationCenter>();
+			timeslotRepository.deleteById(id);
+			return true;
 		}
-		return this.vaccinationCenters;*/
-		return null;
-		
-	}
-	private VaccinationCenter getVaccinationCenterByCode(String vacCenterCode) 
-	{
-		/*if(this.vaccinationCenters == null) 
-		{
-			return null;
-		}
-		for(VaccinationCenter v:this.vaccinationCenters) 
-		{
-			if(v.getCode().equals(vacCenterCode)) 
-			{
-				return v;
-			}
-		}
-		return null;*/
-		return null;
-	}
-	public void removeTimeslot(Timeslot t) 
-	{
-		/*for(VaccinationCenter v:this.vaccinationCenters) 
-		{
-			for(Timeslot timeslot:v.getTimeslots()) 
-			{
-				if(timeslot.equals(t)) 
-				{
-					v.removeTimeslot(t);
-					return;
-				}
-			}
-		}*/
+		return false;
 	}
 	public boolean checkIfTimeslotAlreadyExist(Timeslot timeslot) 
 	{
@@ -108,5 +79,20 @@ public class TimeslotsService {
 			}
 		}
 		return timeslotsFilteredByMonth;
+	}
+	public Timeslot getTimeslotById(Long id) 
+	{
+		Optional<Timeslot> byId = timeslotRepository.findById(id);
+		if(byId.isPresent()) 
+		{
+			return byId.get();
+		}
+		return null;
+	}
+	public void updateTimesotStatus(Long id,boolean status) 
+	{
+		Timeslot t = getTimeslotById(id);
+		t.setAvailable(status);
+		timeslotRepository.save(t);
 	}
 }

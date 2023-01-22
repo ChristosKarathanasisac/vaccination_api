@@ -15,6 +15,8 @@ public class Doctor {
 	@OneToMany(mappedBy="id", cascade= CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<Timeslot> timeslots;
 
+	@OneToMany(mappedBy="id", cascade= CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<Vaccination> vaccinations;
 	
 
 	
