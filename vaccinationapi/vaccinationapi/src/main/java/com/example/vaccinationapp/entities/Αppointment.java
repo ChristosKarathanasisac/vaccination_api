@@ -2,6 +2,8 @@ package com.example.vaccinationapp.entities;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 public class Αppointment {
 	@Id
@@ -11,14 +13,19 @@ public class Αppointment {
 	
 	//@OneToOne(cascade = CascadeType.ALL)
     //@JoinColumn(name = "address_id", referencedColumnName = "id")
+	//@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "citizen_amka",referencedColumnName = "amka")
 	private Citizen citizen;
 	
+	//@OneToOne(cascade= CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
 	@OneToOne(cascade= CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "timeslot",referencedColumnName = "id")
 	private Timeslot timeslot;
+	@JsonIgnore
 	private int changes;
+	@JsonIgnore
+	private boolean active;
 	
 	public Αppointment() {
 		
@@ -28,6 +35,7 @@ public class Αppointment {
 		this.citizen = citizen;
 		this.timeslot = timeslot;
 		this.changes = 2;
+		this.active  =true;
 	}
 	
 	public Long getId() {
@@ -51,6 +59,19 @@ public class Αppointment {
 	public void setChanges(int changes) {
 		this.changes = changes;
 	}
+	
+	public boolean isActive() {
+		return active;
+	}
+	
+	
+	public void setActive(boolean available) {
+		this.active = available;
+	}
+	public void removeTimeslot() 
+	{
+		this.timeslot = null;
+	}
 	@Override
 	 public boolean equals(Object o) {
 		  
@@ -61,6 +82,6 @@ public class Αppointment {
 	            return false;
 	        }
 	        Αppointment a= (Αppointment) o;
-	        return (this.citizen.equals(a.getCitizen())) && (this.timeslot.equals(a.getTimeslot()));
+	        return (this.getId() == a.getId());
 	    }
 }

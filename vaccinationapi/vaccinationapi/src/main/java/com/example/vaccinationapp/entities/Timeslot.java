@@ -8,6 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 public class Timeslot {
 	@Id
@@ -22,13 +24,18 @@ public class Timeslot {
 	private String endHour;
 	private String endMin;
 	private boolean available;
+	
 	@ManyToOne
 	@JoinColumn(name="vaccinationCenter_name")
 	private VaccinationCenter vacCenter;
 	@ManyToOne
 	@JoinColumn(name="doctor_amka")
+	//@JsonIgnore
 	private Doctor doc;
-	@OneToOne(mappedBy = "timeslot")
+	
+	@OneToOne(mappedBy = "timeslot",orphanRemoval = true)
+	//@OneToOne(mappedBy = "timeslot")
+	@JsonIgnore
 	private Αppointment appointment;
 	
 	public Timeslot() {
@@ -92,9 +99,6 @@ public class Timeslot {
 	public void setVacCenter(VaccinationCenter vacCenter) {
 		this.vacCenter = vacCenter;
 	}
-	public void setVacCenterCode(String vacCenterCode) {
-		this.vacCenter.setCode(vacCenterCode);
-	}
 	
 	public Αppointment getAppointment() {
 		return appointment;
@@ -104,6 +108,10 @@ public class Timeslot {
 	}
 	public void setAvailable(boolean available) {
 		this.available = available;
+	}
+	public void removeAppointment() 
+	{
+		this.appointment = null;
 	}
 	public Timeslot(String day, String month, String year, String startHour, String startMin, String endHour,
 			String endMin,Doctor doctor,VaccinationCenter vCenter) {
@@ -141,7 +149,7 @@ public class Timeslot {
 	        		(this.startHour.equals(t.getStartHour())) && (this.startMin.equals(t.getStartMin())) &&(this.endHour.equals(t.getEndHour())
 	        				&&(this.endMin.equals(t.getEndMin())) &&(this.doc.equals(t.getDoc()))
 	        				&&this.getVacCenter().getCode().equals(t.getVacCenter().getCode()));*/
-	        return this.id.equals(t.getId());
+	        return this.id == t.getId();
 	        		
 	    }
 	

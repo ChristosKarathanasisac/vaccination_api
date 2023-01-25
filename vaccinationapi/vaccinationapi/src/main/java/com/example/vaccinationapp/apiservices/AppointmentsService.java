@@ -2,6 +2,7 @@ package com.example.vaccinationapp.apiservices;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,15 @@ public class AppointmentsService {
 	public List<Αppointment> getΑppointments() 
 	{
 		return appointmentRepository.findAll();
+	}
+	public Αppointment getAppointmentById(Long id) 
+	{
+		Optional<Αppointment> byId = appointmentRepository.findById(id);
+		if(byId.isPresent()) 
+		{
+			return byId.get();
+		}
+		return null;
 	}
 	public ArrayList<Αppointment> getΑppointmentsByDoc(Doctor doc) 
 	{
@@ -67,33 +77,45 @@ public class AppointmentsService {
 	public AppointmentsService() {
 		super();
 	}
-	public boolean removeΑppointment(Long id) 
+	public String removeΑppointment(Long id) throws Exception
 	{
-		if(appointmentRepository.findById(id) !=null) 
-		{
-			appointmentRepository.deleteById(id);
-			return true;
-		}
-		return false;
-	}
-	public Timeslot updateAppointment(Αppointment newΑppointment) 
-	{
-		Timeslot oldTimeslot;
-		for(Αppointment a:appointmentRepository.findAll()) 
-		{
-			if(a.getCitizen().equals(newΑppointment.getCitizen())) 
+		//try 
+		//{
+			
+			if(appointmentRepository.findById(id) !=null) 
 			{
-				if(a.getChanges()>0) 
-				{
-					a.setChanges(a.getChanges()-1);
-					oldTimeslot = a.getTimeslot();
-					a.setTimeslot(newΑppointment.getTimeslot());
-					return oldTimeslot;
-				}
-				
+				Αppointment temp = appointmentRepository.findById(id).get();
+				System.out.println("Appointment to delete: "+temp.getId());
+				appointmentRepository.delete(temp);
+				//appointmentRepository.flush();
+				return "";
+			}
+			return "We did not find Αppointment to delete";
+		//}
+		/*catch(Exception exc)
+		{
+			return "Error in removeΑppointment. Exception Message: "+exc.getMessage();
+		}*/
+	}
+	public void updateAppointment(Αppointment appointment,Timeslot newTimeslot ) 
+	{
+		//Timeslot oldTimeslot  = appointment.getTimeslot();
+		//Αppointment a = this.getAppointmentById(appointment.getId());
+		//a.setTimeslot(newTimeslot);
+		//a.setChanges(a.getChanges()-1);
+		for(Αppointment a:this.appointmentRepository.findAll()) 
+		{
+			if(a.getId() == appointment.getId()) 
+			{
+				a.removeTimeslot();
+				a.setTimeslot(newTimeslot);
+				a.setChanges(a.getChanges()-1);
+				this.appointmentRepository.save(a);
+				return;
 			}
 		}
-		return null;
+		appointment.setTimeslot(newTimeslot);
+		appointmentRepository.save(appointment);
 	}
 	public Αppointment getAppointmentByCitizen(String amka) 
 	{
@@ -106,5 +128,10 @@ public class AppointmentsService {
 		}
 		return null;
 	}
-	
+	public void updateAppointmentStatus(Long id,boolean status) 
+	{
+		Αppointment a = getAppointmentById(id);
+		a.setActive(status);
+		appointmentRepository.save(a);
+	}
 }

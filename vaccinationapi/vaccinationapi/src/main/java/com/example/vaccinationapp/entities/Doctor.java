@@ -6,16 +6,26 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 public class Doctor {
 	@Id
 	private String amka;
+	@JsonIgnore
 	private String firstName;
+	@JsonIgnore
 	private String lastName;
+	
+	
+	//@OneToMany(mappedBy="id", cascade= CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
 	@OneToMany(mappedBy="id", cascade= CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonIgnore
 	private List<Timeslot> timeslots;
 
+	//@OneToMany(mappedBy="id", cascade= CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
 	@OneToMany(mappedBy="id", cascade= CascadeType.ALL, fetch = FetchType.LAZY)
+	@JsonIgnore
 	private List<Vaccination> vaccinations;
 	
 

@@ -7,18 +7,26 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 public class Citizen {
 	@Id
 	private String amka;
+	@JsonIgnore
 	private String firstName;
+	@JsonIgnore
 	private String lastName;
+	@JsonIgnore
 	private String afm;
+	@JsonIgnore
 	private String email;
 	
+	//@OneToOne(mappedBy = "citizen",cascade= CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
 	@OneToOne(mappedBy = "citizen",cascade= CascadeType.ALL, fetch = FetchType.LAZY)
 	private Αppointment appointment;
 	
+	//@OneToOne(mappedBy = "citizen",cascade= CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
 	@OneToOne(mappedBy = "citizen",cascade= CascadeType.ALL, fetch = FetchType.LAZY)
 	private Vaccination vaccination;
 	
