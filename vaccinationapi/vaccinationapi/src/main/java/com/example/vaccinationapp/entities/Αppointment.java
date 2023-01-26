@@ -13,9 +13,11 @@ public class Αppointment {
 	
 	//@OneToOne(cascade = CascadeType.ALL)
     //@JoinColumn(name = "address_id", referencedColumnName = "id")
-	//@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "citizen_amka",referencedColumnName = "amka")
+	//@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = false)
+	//@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH,CascadeType.DETACH})
+	@JoinColumn(name = "citizen_amka")
+    //@JoinColumn(name = "citizen_amka",referencedColumnName = "amka")
 	private Citizen citizen;
 	
 	//@OneToOne(cascade= CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)

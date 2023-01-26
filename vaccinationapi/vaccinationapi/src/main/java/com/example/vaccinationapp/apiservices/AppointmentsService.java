@@ -77,12 +77,12 @@ public class AppointmentsService {
 	public AppointmentsService() {
 		super();
 	}
-	public String removeΑppointment(Long id) throws Exception
+	public void removeΑppointment(Long id) throws Exception
 	{
 		//try 
 		//{
-			
-			if(appointmentRepository.findById(id) !=null) 
+			this.appointmentRepository.deleteById(id);
+			/*if(appointmentRepository.findById(id) !=null) 
 			{
 				Αppointment temp = appointmentRepository.findById(id).get();
 				System.out.println("Appointment to delete: "+temp.getId());

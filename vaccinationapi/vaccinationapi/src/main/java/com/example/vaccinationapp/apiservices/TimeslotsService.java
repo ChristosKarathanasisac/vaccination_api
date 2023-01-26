@@ -44,12 +44,13 @@ public class TimeslotsService {
 	}
 	
 	
-	public String removeTimeslot(Long id) throws Exception
+	public void removeTimeslot(Long id) throws Exception
 	{
+		this.timeslotRepository.deleteById(id);
 		//try 
 		//{
 			//Timeslot temp = timeslotRepository.findById(id).get();
-			if(timeslotRepository.findById(id)!=null) 
+			/*if(timeslotRepository.findById(id)!=null) 
 			{
 				Timeslot temp = timeslotRepository.findById(id).get();
 				System.out.println("Id to delete: "+temp.getId());

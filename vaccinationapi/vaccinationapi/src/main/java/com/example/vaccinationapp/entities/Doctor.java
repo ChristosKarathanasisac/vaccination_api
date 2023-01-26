@@ -18,8 +18,8 @@ public class Doctor {
 	private String lastName;
 	
 	
-	//@OneToMany(mappedBy="id", cascade= CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
-	@OneToMany(mappedBy="id", cascade= CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy="id", cascade= CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
+	//@OneToMany(mappedBy="id", cascade= CascadeType.ALL, fetch = FetchType.LAZY)
 	@JsonIgnore
 	private List<Timeslot> timeslots;
 

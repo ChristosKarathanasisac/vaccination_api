@@ -67,7 +67,11 @@ public class VaccinationController {
 		resp.setResultmsg("OK");
 		return resp;
 	} 
-	
+	@GetMapping(path="/testdelete")
+	public void getAvailableTimeslots()  throws Exception{
+		this.timeslotService.removeTimeslot(Long.valueOf(1));
+		//this.appointmentsService.removeΑppointment(Long.valueOf(1));
+	} 
 	@GetMapping(path="/getAvailableTimeslotsByMonth")
 	public Response  getAvailableTimeslotsByMonth(@RequestParam(value="month") String month,
 			@RequestParam(value="year") String year,
@@ -210,6 +214,8 @@ public class VaccinationController {
 	public Response insertVaccination(@RequestBody RequestInsertVaccination r)  throws Exception{
 		Response resp = new Response();
 		
+		Long timeslotToDeleteID = appointmentsService.getAppointmentByCitizen(r.getCitizenAMKA()).getTimeslot().getId();
+		this.timeslotService.removeTimeslot(timeslotToDeleteID);
 		//Input Checks
 		Doctor doctor = applicationService.getDoctorByAMKA(r.getDoctorAMKA());
 		if(doctor==null) 
@@ -226,12 +232,15 @@ public class VaccinationController {
 			return resp;
 		}
 		
+		//this.timeslotService.removeTimeslot(appointmentToDelete.getId());
+		//this.appointmentsService.removeΑppointment(appointmentToDelete.getId());
+		
 		//Add Vaccination
 		Vaccination vac = new Vaccination(citizen,doctor,r.getDate(),DateUtils.addMonths(r.getDate(), 6));
 		vaccinationService.addVaccination(vac);
-		
+		//Αppointment appointmentToDelete = appointmentsService.getAppointmentByCitizen(r.getCitizenAMKA());
 		//Delete Timeslot and Appointment
-		Αppointment appointmentToDelete = appointmentsService.getAppointmentByCitizen(r.getCitizenAMKA());
+		
 		/*
 		if(appointmentToDelete ==null) 
 		{
@@ -258,8 +267,9 @@ public class VaccinationController {
 		
 		
 		*/
-		appointmentsService.updateAppointmentStatus(appointmentToDelete.getId(), false);
-	    timeslotService.updateTimeslotStatus(appointmentToDelete.getTimeslot().getId(), false);
+		//appointmentsService.updateAppointmentStatus(appointmentToDelete.getId(), false);
+	    //timeslotService.updateTimeslotStatus(appointmentToDelete.getTimeslot().getId(), false);
+		//Αppointment appointmentToDelete = appointmentsService.getAppointmentByCitizen(r.getCitizenAMKA());
 		resp.setStatus("SUCCESS");
 		resp.setResultmsg("Vaccination Added");
 		return resp;
