@@ -224,6 +224,36 @@ public class VaccinationController {
 		return resp;
 
 	}
+	
+	@PostMapping(path = "/getCitizenAppointment")
+	public Response getAppointments(@RequestBody Citizen citizen) throws Exception {
+		Response resp = new Response();
+
+		if (citizen == null) {
+			resp.setStatus("ERROR");
+			resp.setWarningMessage("Citizen in request was null");
+			return resp;
+		}
+
+		Citizen aCitizen = this.applicationService.getCitizenByAMKA(citizen.getAmka());
+		if (aCitizen == null) {
+			resp.setStatus("ERROR");
+			resp.setWarningMessage("Missing citizen");
+			return resp;
+		}
+
+		Appointment appointment = this.appointmentsService.getAppointmentByCitizen(citizen.getAmka());
+		if (appointment == null) {
+			resp.setStatus("ERROR");
+			resp.setStatus("appointments was null");
+			return resp;
+		}
+		resp.setStatus("SUCCESS");
+		resp.setResultmsg("OK");
+		resp.setObj(appointment);
+		return resp;
+
+	}
 
 	@PostMapping(path = "/getTodaysAppointments")
 	public Response getTodaysAppointments(@RequestBody Doctor doc) throws Exception {
@@ -319,7 +349,8 @@ public class VaccinationController {
 			return resp;
 		}
 		
-		if(timeslot.getDoc()==null) 
+		Doctor doctor = this.applicationService.getDoctorByAMKA(timeslot.getDoc().getAmka());
+		if(doctor==null) 
 		{
 			resp.setStatus("ERROR");
 			resp.setWarningMessage("Doctor was null");
