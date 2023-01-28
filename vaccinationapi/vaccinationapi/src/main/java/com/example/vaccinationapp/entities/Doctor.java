@@ -45,6 +45,20 @@ public class Doctor {
 	}
 
 
+	@Override
+	public boolean equals(Object o) {
+
+		if (o == this) {
+			return true;
+		}
+
+		if (!(o instanceof Doctor)) {
+			return false;
+		}
+		Doctor d = (Doctor) o;
+		return this.amka == d.getAmka();
+
+	}
 
 	public String getAmka() {
 		return amka;

@@ -12,27 +12,26 @@ import com.example.vaccinationapp.repositories.ΑppointmentRepository;
 
 @Service
 public class AppointmentsService {
-	//ArrayList<Αppointment> appointments;
 	@Autowired
 	ΑppointmentRepository appointmentRepository;
 	
-	public List<Αppointment> getΑppointments() 
+	public List<Appointment> getΑppointments() 
 	{
 		return appointmentRepository.findAll();
 	}
-	public Αppointment getAppointmentById(Long id) 
+	public Appointment getAppointmentById(Long id) 
 	{
-		Optional<Αppointment> byId = appointmentRepository.findById(id);
+		Optional<Appointment> byId = appointmentRepository.findById(id);
 		if(byId.isPresent()) 
 		{
 			return byId.get();
 		}
 		return null;
 	}
-	public ArrayList<Αppointment> getΑppointmentsByDoc(Doctor doc) 
+	public ArrayList<Appointment> getΑppointmentsByDoc(Doctor doc) 
 	{
-		ArrayList<Αppointment> appointmentsByDoc = new ArrayList<Αppointment>();
-		for(Αppointment a:appointmentRepository.findAll()) 
+		ArrayList<Appointment> appointmentsByDoc = new ArrayList<Appointment>();
+		for(Appointment a:appointmentRepository.findAll()) 
 		{
 			if(a.getTimeslot().getDoc().equals(doc))
 			{
@@ -41,10 +40,10 @@ public class AppointmentsService {
 		}
 		return appointmentsByDoc;
 	}
-	public ArrayList<Αppointment> getΑppointmentsByDoc(String docAMKA) 
+	public ArrayList<Appointment> getΑppointmentsByDoc(String docAMKA) 
 	{
-		ArrayList<Αppointment> appointmentsByDoc = new ArrayList<Αppointment>();
-		for(Αppointment a:appointmentRepository.findAll()) 
+		ArrayList<Appointment> appointmentsByDoc = new ArrayList<Appointment>();
+		for(Appointment a:appointmentRepository.findAll()) 
 		{
 			if(a.getTimeslot().getDoc().getAmka().equals(docAMKA))
 			{
@@ -53,12 +52,11 @@ public class AppointmentsService {
 		}
 		return appointmentsByDoc;
 	}
-	public ArrayList<Αppointment> getΑppointmentsByDay(String docAMKA,String day,String month,String year)
+	public ArrayList<Appointment> getΑppointmentsByDay(String docAMKA,String day,String month,String year)
 	{
-		//ArrayList<Αppointment> appointmentsByDoc = getΑppointmentsByDoc(docAMKA);
-		ArrayList<Αppointment> appointmentsByDay = new ArrayList<Αppointment>();
+		ArrayList<Appointment> appointmentsByDay = new ArrayList<Appointment>();
 		
-		for(Αppointment a:appointmentRepository.findAll()) 
+		for(Appointment a:appointmentRepository.findAll()) 
 		{
 			if(a.getTimeslot().getDay().equals(day) && a.getTimeslot().getMonth().equals(month) && 
 					a.getTimeslot().getYear().equals(year))
@@ -70,7 +68,7 @@ public class AppointmentsService {
 	}
 
 	
-	public void addΑppointment(Αppointment appointment) 
+	public void addΑppointment(Appointment appointment) 
 	{
 		appointmentRepository.save(appointment);
 	}
@@ -79,31 +77,12 @@ public class AppointmentsService {
 	}
 	public void removeΑppointment(Long id) throws Exception
 	{
-		//try 
-		//{
-			this.appointmentRepository.deleteById(id);
-			/*if(appointmentRepository.findById(id) !=null) 
-			{
-				Αppointment temp = appointmentRepository.findById(id).get();
-				System.out.println("Appointment to delete: "+temp.getId());
-				appointmentRepository.delete(temp);
-				//appointmentRepository.flush();
-				return "";
-			}
-			return "We did not find Αppointment to delete";
-		//}
-		/*catch(Exception exc)
-		{
-			return "Error in removeΑppointment. Exception Message: "+exc.getMessage();
-		}*/
+		this.appointmentRepository.deleteById(id);	
 	}
-	public void updateAppointment(Αppointment appointment,Timeslot newTimeslot ) 
+	public void updateAppointment(Appointment appointment,Timeslot newTimeslot ) 
 	{
-		//Timeslot oldTimeslot  = appointment.getTimeslot();
-		//Αppointment a = this.getAppointmentById(appointment.getId());
-		//a.setTimeslot(newTimeslot);
-		//a.setChanges(a.getChanges()-1);
-		for(Αppointment a:this.appointmentRepository.findAll()) 
+		
+		for(Appointment a:this.appointmentRepository.findAll()) 
 		{
 			if(a.getId() == appointment.getId()) 
 			{
@@ -117,9 +96,9 @@ public class AppointmentsService {
 		appointment.setTimeslot(newTimeslot);
 		appointmentRepository.save(appointment);
 	}
-	public Αppointment getAppointmentByCitizen(String amka) 
+	public Appointment getAppointmentByCitizen(String amka) 
 	{
-		for(Αppointment a:appointmentRepository.findAll()) 
+		for(Appointment a:appointmentRepository.findAll()) 
 		{
 			if(a.getCitizen().getAmka().equals(amka)) 
 			{
@@ -128,10 +107,30 @@ public class AppointmentsService {
 		}
 		return null;
 	}
-	public void updateAppointmentStatus(Long id,boolean status) 
+	public String checkIfAppointmentExist(Timeslot aTimeslot) 
 	{
-		Αppointment a = getAppointmentById(id);
-		a.setActive(status);
-		appointmentRepository.save(a);
+		for(Appointment a:this.appointmentRepository.findAll()) 
+		{
+			Timeslot t = a.getTimeslot();
+			if(!t.getDoc().getAmka().equals(aTimeslot.getDoc().getAmka())) 
+			{
+				continue;
+			}
+			
+			if(!t.timeslotsDatesChecker(aTimeslot)) 
+			{
+				continue;
+			}
+			if(!t.timeslotsTimesChecker(aTimeslot))
+			{
+				continue;
+			}
+			
+			return "You can not add this timeslot. You already have an appointment at "+t.getTimeslotDateString()+ " ("
+			+t.getTimeslotStartTimeString()+"-"+t.getTimeslotEndTimeString()+")";
+			
+			
+		}
+		return "";
 	}
 }

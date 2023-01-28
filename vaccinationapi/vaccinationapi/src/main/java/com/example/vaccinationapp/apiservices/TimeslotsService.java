@@ -1,17 +1,14 @@
 package com.example.vaccinationapp.apiservices;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
-import org.hibernate.criterion.Example;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Service;
 
 import com.example.vaccinationapp.entities.*;
 import com.example.vaccinationapp.repositories.TimeslotRepository;
-import com.example.vaccinationapp.repositories.VaccinationCenterRepository;
 
 
 
@@ -38,51 +35,15 @@ public class TimeslotsService {
 	
 	public void addTimeslot(Timeslot timeslot) 
 	{
-		//System.out.println("Inside addTimeslot");
 		timeslotRepository.save(timeslot);
-		//System.out.println("Timeslot Added");
 	}
 	
 	
 	public void removeTimeslot(Long id) throws Exception
 	{
 		this.timeslotRepository.deleteById(id);
-		//try 
-		//{
-			//Timeslot temp = timeslotRepository.findById(id).get();
-			/*if(timeslotRepository.findById(id)!=null) 
-			{
-				Timeslot temp = timeslotRepository.findById(id).get();
-				System.out.println("Id to delete: "+temp.getId());
-				timeslotRepository.delete(temp);
-				//timeslotRepository.flush();;
-				
-				return "";
-			}
-			return "We did not find Timeslot to delete";
-		/*}
-		catch(Exception exc)
-		{
-			return "Error in removeTimeslot. Exception Message: "+exc.getMessage();
-		}*/
-		
-		
 	}
-	public boolean checkIfTimeslotAlreadyExist(Timeslot timeslot) 
-	{
-		/*
-		VaccinationCenter vc = getVaccinationCenterByCode(timeslot.getVacCenter().getCode());
-		for(Timeslot t:vc.getTimeslots()) 
-		{
-			if(t.equals(timeslot)) 
-			{
-				return true;
-			}
-		}
-		return false;
-		*/
-		return false;
-	}
+	
 	public ArrayList<Timeslot> getTimeslotsByMonth(String month,String year,String vacCenterCode)
 	{
 		ArrayList<Timeslot> timeslotsFilteredByMonth = new ArrayList<Timeslot>();
@@ -110,4 +71,31 @@ public class TimeslotsService {
 		t.setAvailable(status);
 		timeslotRepository.save(t);
 	}
+	
+	public String checkIfTimislotExist(Timeslot aTimeslot) 
+	{
+		for(Timeslot t:this.timeslotRepository.findAll()) 
+		{
+			if(!t.getDoc().getAmka().equals(aTimeslot.getDoc().getAmka())) 
+			{
+				continue;
+			}
+			
+			if(!t.timeslotsDatesChecker(aTimeslot)) 
+			{
+				continue;
+			}
+			if(!t.timeslotsTimesChecker(aTimeslot))
+			{
+				continue;
+			}
+			
+			return "You can not add this timeslot. You already have a timeslot at "+t.getTimeslotDateString()+ " ("
+			+t.getTimeslotStartTimeString()+"-"+t.getTimeslotEndTimeString()+")";
+			
+			
+		}
+		return "";
+	}
+
 }

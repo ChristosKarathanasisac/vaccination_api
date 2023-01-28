@@ -10,7 +10,7 @@ public class Vaccination {
     @Column(name = "id",unique=true)
 	private Long id;
 	
-	@OneToOne(cascade= CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = false)
+	@OneToOne(cascade= CascadeType.ALL, fetch = FetchType.LAZY)
 	//@OneToOne(cascade= CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
     @JoinColumn(name = "citizen",referencedColumnName = "amka")
 	private Citizen citizen;

@@ -4,7 +4,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -26,7 +25,7 @@ public class Citizen {
 	@OneToOne(mappedBy = "citizen", fetch = FetchType.LAZY,orphanRemoval = false)
 	@JsonIgnore
 	//@OneToOne(mappedBy = "citizen",cascade= CascadeType.ALL, fetch = FetchType.LAZY)
-	private Αppointment appointment;
+	private Appointment appointment;
 	
 	//@OneToOne(mappedBy = "citizen",cascade= CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
 	@OneToOne(mappedBy = "citizen",cascade= CascadeType.ALL, fetch = FetchType.LAZY)
@@ -91,7 +90,7 @@ public class Citizen {
 
 
 
-	public Αppointment getAppointment() {
+	public Appointment getAppointment() {
 		return appointment;
 	}
 

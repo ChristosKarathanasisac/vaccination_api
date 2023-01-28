@@ -49,6 +49,8 @@ public class VaccinationController {
 	@Autowired
 	private ApplicationService applicationService;
 	
+	
+	
 	@GetMapping(path="/getAvailableTimeslots")
 	public Response getAvailableTimeslots(@RequestParam(value="day") String day,
 			@RequestParam(value="month") String month,
@@ -67,10 +69,11 @@ public class VaccinationController {
 		resp.setResultmsg("OK");
 		return resp;
 	} 
-	@GetMapping(path="/testdelete")
+	@GetMapping(path="/test")
 	public void getAvailableTimeslots()  throws Exception{
-		this.timeslotService.removeTimeslot(Long.valueOf(1));
+		//this.timeslotService.removeTimeslot(Long.valueOf(1));
 		//this.appointmentsService.removeΑppointment(Long.valueOf(1));
+		//this.timeslotService.test();
 	} 
 	@GetMapping(path="/getAvailableTimeslotsByMonth")
 	public Response  getAvailableTimeslotsByMonth(@RequestParam(value="month") String month,
@@ -127,7 +130,7 @@ public class VaccinationController {
 			resp.setWarningMessage("Citizen has already Appointment.");
 			return resp;
 		}
-		Αppointment appointment = new Αppointment(citizen,ts);
+		Appointment appointment = new Appointment(citizen,ts);
 		
 		appointmentsService.addΑppointment(appointment);
 		timeslotService.updateTimeslotStatus(ts.getId(), false);
@@ -141,7 +144,7 @@ public class VaccinationController {
 	public Response changeAppointment(@RequestBody RequestUpdateAppointment r)  throws Exception{
 		
 		Response resp = new Response();
-		Αppointment appointment = this.appointmentsService.getAppointmentById(r.getAppointmentID());
+		Appointment appointment = this.appointmentsService.getAppointmentById(r.getAppointmentID());
 		if(appointment == null) 
 		{
 			resp.setStatus("ERROR");
@@ -182,7 +185,7 @@ public class VaccinationController {
 	
 	
 	@PostMapping(path="/getAppointments")
-	public ArrayList<Αppointment> getAppointments(@RequestBody Doctor doc)  throws Exception{
+	public ArrayList<Appointment> getAppointments(@RequestBody Doctor doc)  throws Exception{
 		if(!(doc==null))
 		{
 			return appointmentsService.getΑppointmentsByDoc(doc);
@@ -194,7 +197,7 @@ public class VaccinationController {
 		
 	} 
 	@PostMapping(path="/getAppointmentsByDay")
-	public ArrayList<Αppointment> getAppointments(@RequestBody String[] searchFilters)  throws Exception{
+	public ArrayList<Appointment> getAppointments(@RequestBody String[] searchFilters)  throws Exception{
 		if(!(searchFilters==null))
 		{
 			String day = searchFilters[0];
@@ -232,56 +235,44 @@ public class VaccinationController {
 			return resp;
 		}
 		
-		//this.timeslotService.removeTimeslot(appointmentToDelete.getId());
-		//this.appointmentsService.removeΑppointment(appointmentToDelete.getId());
-		
-		//Add Vaccination
 		Vaccination vac = new Vaccination(citizen,doctor,r.getDate(),DateUtils.addMonths(r.getDate(), 6));
 		vaccinationService.addVaccination(vac);
-		//Αppointment appointmentToDelete = appointmentsService.getAppointmentByCitizen(r.getCitizenAMKA());
-		//Delete Timeslot and Appointment
 		
-		/*
-		if(appointmentToDelete ==null) 
-		{
-			resp.setStatus("ERROR");
-			resp.setResultmsg("Dont find appointmentToDelete");
-			return resp;
-		} 
-		
-		String res = timeslotService.removeTimeslot(appointmentToDelete.getTimeslot().getId());
-		if(!res.isBlank())
-	    {
-			resp.setStatus("ERROR");
-			resp.setWarningMessage(res);
-			return resp;
-	    }
-		
-		res = appointmentsService.removeΑppointment(appointmentToDelete.getId());
-		if(!res.isBlank())
-	    {
-			resp.setStatus("ERROR");
-			resp.setWarningMessage(res);
-			return resp;
-	    }
-		
-		
-		*/
-		//appointmentsService.updateAppointmentStatus(appointmentToDelete.getId(), false);
-	    //timeslotService.updateTimeslotStatus(appointmentToDelete.getTimeslot().getId(), false);
-		//Αppointment appointmentToDelete = appointmentsService.getAppointmentByCitizen(r.getCitizenAMKA());
 		resp.setStatus("SUCCESS");
 		resp.setResultmsg("Vaccination Added");
 		return resp;
 	} 
-	//http://localhost:8080/insertTimeSlot?day=1&hour=11&minute=30
+
 	@PostMapping(path="/insertTimeSlot")
-	public void insertTimeSlot(@RequestBody Timeslot timeslot)  throws Exception{
+	public Response insertTimeSlot(@RequestBody Timeslot timeslot)  throws Exception{
+		
+		Response resp = new Response();
 		if((timeslot==null)) 
 		{
-			System.out.println("Problem in request");
+			resp.setStatus("ERROR");
+			resp.setWarningMessage("Timeslot was null");
+			return resp;
 		}
-		//timeslot.createId();
+		
+		String result = this.timeslotService.checkIfTimislotExist(timeslot);
+		
+		if(!result.isBlank()) 
+		{
+			resp.setStatus("ERROR");
+			resp.setWarningMessage(result);
+			return resp;
+		}
+		
+		result = this.appointmentsService.checkIfAppointmentExist(timeslot);
+		if(!result.isBlank()) 
+		{
+			resp.setStatus("ERROR");
+			resp.setWarningMessage(result);
+			return resp;
+		}
 		this.timeslotService.addTimeslot(timeslot);
+		resp.setStatus("SUCCESS");
+		resp.setResultmsg("Timeslot Added");
+		return resp;
 	} 
 }
