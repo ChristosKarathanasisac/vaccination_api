@@ -1,5 +1,6 @@
 package com.vaccination_api.vaccinationapi.app;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -67,11 +68,12 @@ public class VaccinationController {
 	}
 
 	@GetMapping(path = "/test")
-	public void test() throws Exception {
+	public List<Appointment> test() throws Exception {
 		// this.timeslotService.removeTimeslot(Long.valueOf(1));
 		// this.appointmentsService.removeΑppointment(Long.valueOf(1));
 		// this.timeslotService.test();
-		this.vaccinationService.removeVaccination(Long.valueOf(1));
+		System.out.println("Appointments count: " + this.appointmentsService.getΑppointments().size());
+		return this.appointmentsService.getΑppointments();
 	}
 
 	@GetMapping(path = "/getAvailableTimeslotsByMonth")
@@ -93,8 +95,8 @@ public class VaccinationController {
 
 	@GetMapping(path = "/getVaccinationCenters")
 	public List<VaccinationCenter> getVaccinationCenters() throws Exception {
-		// return timeslotService.getAllVaccinationCenters();
-		return null;
+		return this.applicationService.getVaccinationCenters();
+
 	}
 
 	@PostMapping(path = "/bookAppointment")
@@ -178,48 +180,92 @@ public class VaccinationController {
 			resp.setWarningMessage("Citizen missing");
 			return resp;
 		}
-		
+
 		Vaccination vaccination = this.vaccinationService.getVaccinationByCitizen(amka);
-		if(vaccination == null) 
-		{
+		if (vaccination == null) {
 			resp.setStatus("SUCCESS");
 			resp.setResultmsg("NOT VACCINATED");
 			return resp;
-		}
-		else 
-		{
+		} else {
 			resp.setStatus("SUCCESS");
 			resp.setResultmsg("VACCINATED");
 			resp.setObj(vaccination);
 			return resp;
 		}
 
-		
 	}
 
 	@PostMapping(path = "/getAppointments")
-	public ArrayList<Appointment> getAppointments(@RequestBody Doctor doc) throws Exception {
-		if (!(doc == null)) {
-			return appointmentsService.getΑppointmentsByDoc(doc);
-		} else {
-			System.out.println("doc was null");
-			return null;
+	public Response getAppointments(@RequestBody Doctor doc) throws Exception {
+		Response resp = new Response();
+
+		if (doc == null) {
+			resp.setStatus("ERROR");
+			resp.setWarningMessage("Doctor in request was null");
+			return resp;
 		}
+
+		Doctor doctor = this.applicationService.getDoctorByAMKA(doc.getAmka());
+		if (doctor == null) {
+			resp.setStatus("ERROR");
+			resp.setWarningMessage("Missing doctor");
+			return resp;
+		}
+
+		ArrayList<Appointment> appointments = this.appointmentsService.getΑppointmentsByDoc(doctor.getAmka());
+		if (appointments == null) {
+			resp.setStatus("ERROR");
+			resp.setStatus("appointments was null");
+			return resp;
+		}
+		resp.setStatus("SUCCESS");
+		resp.setResultmsg("OK");
+		resp.setObj(appointments);
+		return resp;
 
 	}
 
-	@PostMapping(path = "/getAppointmentsByDay")
-	public ArrayList<Appointment> getAppointments(@RequestBody String[] searchFilters) throws Exception {
-		if (!(searchFilters == null)) {
-			String day = searchFilters[0];
-			String month = searchFilters[1];
-			String year = searchFilters[2];
-			String docAMKA = searchFilters[3];
-			return appointmentsService.getΑppointmentsByDay(docAMKA, day, month, year);
-		} else {
-			System.out.println("doc was null");
-			return null;
+	@PostMapping(path = "/getTodaysAppointments")
+	public Response getTodaysAppointments(@RequestBody Doctor doc) throws Exception {
+		Response resp = new Response();
+
+		if (doc == null) {
+			resp.setStatus("ERROR");
+			resp.setWarningMessage("Doctor in request was null");
+			return resp;
 		}
+
+		Doctor doctor = this.applicationService.getDoctorByAMKA(doc.getAmka());
+		if (doctor == null) {
+			resp.setStatus("ERROR");
+			resp.setWarningMessage("Missing doctor");
+			return resp;
+		}
+
+		LocalDate currentdate = LocalDate.now();
+		String day = String.valueOf(currentdate.getDayOfMonth());
+		;
+		String month = String.valueOf(currentdate.getMonthValue());
+		;
+		String year = String.valueOf(currentdate.getYear());
+		if (currentdate.getDayOfMonth() <= 9) {
+			day = "0" + day;
+		}
+		if (currentdate.getMonthValue() <= 9) {
+			month = "0" + month;
+		}
+
+		ArrayList<Appointment> appointments = this.appointmentsService.getΑppointmentsByDay(doctor.getAmka(), day,
+				month, year);
+		if (appointments == null) {
+			resp.setStatus("ERROR");
+			resp.setStatus("appointments was null");
+			return resp;
+		}
+		resp.setStatus("SUCCESS");
+		resp.setResultmsg("OK");
+		resp.setObj(appointments);
+		return resp;
 
 	}
 
@@ -238,7 +284,7 @@ public class VaccinationController {
 		if (oldVaccination != null) {
 			this.vaccinationService.removeVaccination(oldVaccination.getId());
 		}
-		
+
 		Long timeslotToDeleteID = appointmentsService.getAppointmentByCitizen(r.getCitizenAMKA()).getTimeslot().getId();
 		this.timeslotService.removeTimeslot(timeslotToDeleteID);
 		// Input Checks
@@ -270,6 +316,13 @@ public class VaccinationController {
 		if ((timeslot == null)) {
 			resp.setStatus("ERROR");
 			resp.setWarningMessage("Timeslot was null");
+			return resp;
+		}
+		
+		if(timeslot.getDoc()==null) 
+		{
+			resp.setStatus("ERROR");
+			resp.setWarningMessage("Doctor was null");
 			return resp;
 		}
 

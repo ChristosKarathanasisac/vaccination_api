@@ -2,9 +2,13 @@ package com.example.vaccinationapp.entities;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
+@JsonAutoDetect(fieldVisibility = Visibility.ANY)
 public class Appointment {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -15,8 +19,10 @@ public class Appointment {
 	@JoinColumn(name = "citizen_amka")
 	private Citizen citizen;
 	
-	@OneToOne(cascade= CascadeType.ALL, fetch = FetchType.LAZY)
+	//@OneToOne(cascade= CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToOne(cascade= CascadeType.ALL)
     @JoinColumn(name = "timeslot",referencedColumnName = "id")
+	@JsonManagedReference
 	private Timeslot timeslot;
 	@JsonIgnore
 	private int changes;

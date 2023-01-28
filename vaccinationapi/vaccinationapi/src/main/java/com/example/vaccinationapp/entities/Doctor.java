@@ -19,7 +19,7 @@ public class Doctor {
 	
 	
 	@OneToMany(mappedBy="id", cascade= CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
-	@JsonIgnore
+	//@JsonIgnore
 	private List<Timeslot> timeslots;
 
 	@OneToMany(mappedBy="id", cascade= CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)

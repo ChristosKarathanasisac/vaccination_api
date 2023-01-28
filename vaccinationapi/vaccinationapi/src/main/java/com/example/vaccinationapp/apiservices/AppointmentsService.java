@@ -47,6 +47,7 @@ public class AppointmentsService {
 		{
 			if(a.getTimeslot().getDoc().getAmka().equals(docAMKA))
 			{
+				//appointmentsByDoc.add(appointmentRepository.findById(a.getId()).get());
 				appointmentsByDoc.add(a);
 			}
 		}

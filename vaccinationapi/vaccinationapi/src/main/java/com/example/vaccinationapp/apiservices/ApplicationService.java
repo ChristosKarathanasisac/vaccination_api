@@ -1,5 +1,6 @@
 package com.example.vaccinationapp.apiservices;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,10 @@ public class ApplicationService {
 		}
 		return null;
 			
+	}
+	public List<VaccinationCenter> getVaccinationCenters()
+	{
+		return this.vaccinationCenterRepository.findAll();
 	}
 
 }

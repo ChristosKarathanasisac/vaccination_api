@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,9 +14,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
+@JsonAutoDetect(fieldVisibility = Visibility.ANY)
 public class Timeslot {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,14 +38,13 @@ public class Timeslot {
 	@ManyToOne
 	@JoinColumn(name = "vaccinationCenter_name")
 	private VaccinationCenter vacCenter;
-	@ManyToOne
+	@ManyToOne()
 	@JoinColumn(name = "doctor_amka")
-	// @JsonIgnore
+	//@JsonIgnore
 	private Doctor doc;
 
 	@OneToOne(mappedBy = "timeslot", orphanRemoval = true)
-	// @OneToOne(mappedBy = "timeslot")
-	@JsonIgnore
+	@JsonBackReference
 	private Appointment appointment;
 
 	//////////////////////// Constructors//////////////////////////////////
@@ -201,7 +205,7 @@ public class Timeslot {
 		}
 		return true;
 	}
-
+	@JsonIgnore
 	public Date getTimeslotStartTime() {
 		try {
 			String timeString = this.startHour + ":" + this.startMin + ":" + "00";
@@ -212,7 +216,7 @@ public class Timeslot {
 		}
 
 	}
-
+	@JsonIgnore
 	public Date getTimeslotEndTime() {
 		try {
 			String timeString = this.endHour + ":" + this.endMin + ":" + "00";
@@ -223,19 +227,18 @@ public class Timeslot {
 		}
 
 	}
-
+	@JsonIgnore
 	public String getTimeslotStartTimeString() {
 		return this.startHour + ":" + this.startMin;
 	}
-
+	@JsonIgnore
 	public String getTimeslotEndTimeString() {
 		return this.endHour + ":" + this.endMin;
 	}
-
+	@JsonIgnore
 	public String getTimeslotDateString() {
 		return this.year + "-" + this.month + "-" + this.day;
 	}
-
 	public boolean timeslotsTimesChecker(Timeslot testingTimeslot) {
 		Timeslot existingTimeslot = this;
 		Calendar calendarExistingTimeslotStartTime = Calendar.getInstance();
