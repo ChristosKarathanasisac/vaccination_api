@@ -11,23 +11,16 @@ public class Appointment {
     @Column(name = "id",unique=true)
 	private Long id;
 	
-	//@OneToOne(cascade = CascadeType.ALL)
-    //@JoinColumn(name = "address_id", referencedColumnName = "id")
-	//@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = false)
-	//@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	@OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH,CascadeType.DETACH})
 	@JoinColumn(name = "citizen_amka")
-    //@JoinColumn(name = "citizen_amka",referencedColumnName = "amka")
 	private Citizen citizen;
 	
-	//@OneToOne(cascade= CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
 	@OneToOne(cascade= CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "timeslot",referencedColumnName = "id")
 	private Timeslot timeslot;
 	@JsonIgnore
 	private int changes;
-	//@JsonIgnore
-	//private boolean active;
+	
 	
 	public Appointment() {
 		

@@ -33,6 +33,7 @@ public class ServiceConfig implements CommandLineRunner{
 		Citizen c2 = new Citizen("31129001272", "Dimitris", "Pasxos", "987654321","dim@gmail.com");
 		Citizen c3 = new Citizen("07029031293", "Giannis", "Lazarides", "124106708","laz@gmail.com");
 		Citizen c4 = new Citizen("31129001274", "Nikos", "Polytarxou", "980893831","pol@gmail.com");
+		
 		appService.addCitizen(c1);
 		appService.addCitizen(c2);
 		appService.addCitizen(c3);

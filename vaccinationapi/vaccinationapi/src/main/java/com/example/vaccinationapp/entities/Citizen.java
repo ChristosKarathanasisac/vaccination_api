@@ -21,14 +21,12 @@ public class Citizen {
 	@JsonIgnore
 	private String email;
 	
-	//@OneToOne(mappedBy = "citizen",cascade= CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = false)
+	
 	@OneToOne(mappedBy = "citizen", fetch = FetchType.LAZY,orphanRemoval = false)
 	@JsonIgnore
-	//@OneToOne(mappedBy = "citizen",cascade= CascadeType.ALL, fetch = FetchType.LAZY)
 	private Appointment appointment;
 	
-	//@OneToOne(mappedBy = "citizen",cascade= CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
-	@OneToOne(mappedBy = "citizen",cascade= CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToOne(mappedBy = "citizen", fetch = FetchType.LAZY,orphanRemoval = false)
 	private Vaccination vaccination;
 	
 	public Citizen() {

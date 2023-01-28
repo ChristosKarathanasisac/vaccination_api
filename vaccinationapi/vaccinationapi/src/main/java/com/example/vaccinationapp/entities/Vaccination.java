@@ -3,6 +3,8 @@ package com.example.vaccinationapp.entities;
 import java.util.Date;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 public class Vaccination {
 	@Id
@@ -10,17 +12,19 @@ public class Vaccination {
     @Column(name = "id",unique=true)
 	private Long id;
 	
-	@OneToOne(cascade= CascadeType.ALL, fetch = FetchType.LAZY)
-	//@OneToOne(cascade= CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
+	@OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH,CascadeType.DETACH})
     @JoinColumn(name = "citizen",referencedColumnName = "amka")
+	@JsonIgnore
 	private Citizen citizen;
 	
 	@ManyToOne
 	@JoinColumn(name="doctor_amka")
+	@JsonIgnore
 	private Doctor doctor;
 	
 	private Date vaccinationDate;
 	private Date vaccinationEndDate;
+	
 	
 	
 	public Vaccination(Citizen citizen, Doctor doctor, Date vaccinationDate, Date vaccinationEndDate) {
@@ -56,6 +60,10 @@ public class Vaccination {
 	public void setVaccinationEndDate(Date vaccinationEndDate) {
 		this.vaccinationEndDate = vaccinationEndDate;
 	}
+	
+	public Long getId() {
+		return id;
+	}
 	@Override
 	 public boolean equals(Object o) {
 		  
@@ -67,7 +75,7 @@ public class Vaccination {
 	            return false;
 	        }
 	        Vaccination v = (Vaccination) o;
-	        return (this.getCitizen().equals(v.getCitizen())) && (this.vaccinationDate.equals(v.getVaccinationDate()));
+	        return this.id == v.getId();
 	        		
 	    }
 	

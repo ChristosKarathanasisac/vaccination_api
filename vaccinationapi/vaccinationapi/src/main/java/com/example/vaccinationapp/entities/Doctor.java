@@ -19,12 +19,10 @@ public class Doctor {
 	
 	
 	@OneToMany(mappedBy="id", cascade= CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
-	//@OneToMany(mappedBy="id", cascade= CascadeType.ALL, fetch = FetchType.LAZY)
 	@JsonIgnore
 	private List<Timeslot> timeslots;
 
-	//@OneToMany(mappedBy="id", cascade= CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
-	@OneToMany(mappedBy="id", cascade= CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy="id", cascade= CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
 	@JsonIgnore
 	private List<Vaccination> vaccinations;
 	
