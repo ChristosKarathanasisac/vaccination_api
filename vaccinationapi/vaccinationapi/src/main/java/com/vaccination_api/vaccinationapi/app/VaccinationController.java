@@ -100,6 +100,7 @@ public class VaccinationController {
 			return resp;
 		}
 		ArrayList<Timeslot> tmslots = this.timeslotService.getTimeslotsByMonth(month, year, vacCenterCode);
+		System.out.println("Timeslot by month: "+tmslots.size());
 		resp.setStatus("SUCCESS");
 		resp.setObj(tmslots);
 		resp.setResultmsg("OK");
@@ -287,9 +288,9 @@ public class VaccinationController {
 
 		LocalDate currentdate = LocalDate.now();
 		String day = String.valueOf(currentdate.getDayOfMonth());
-		;
+		
 		String month = String.valueOf(currentdate.getMonthValue());
-		;
+		
 		String year = String.valueOf(currentdate.getYear());
 		if (currentdate.getDayOfMonth() <= 9) {
 			day = "0" + day;
@@ -396,7 +397,7 @@ public class VaccinationController {
 		if(!this.applicationService.dateValidation(timeslot.getDay(), timeslot.getMonth(),timeslot.getYear())) 
 		{
 			resp.setStatus("ERROR");
-			resp.setWarningMessage("The date formatting was wrong or you searching for an older date");
+			resp.setWarningMessage("The date formatting was wrong or you try to insert an older date");
 			return resp;
 		}
 		Doctor doctor = this.applicationService.getDoctorByAMKA(timeslot.getDoc().getAmka());
