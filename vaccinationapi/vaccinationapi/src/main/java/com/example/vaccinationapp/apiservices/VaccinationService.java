@@ -54,15 +54,5 @@ public Vaccination getInvalidVaccinationByCitizen(String amka)
 	
 }
 
-/*public boolean checkIfVaccinationExist(Vaccination vaccination) 
-{
-	for(Vaccination v:this.vaccinations) 
-	{
-		if(v.equals(vaccination)) 
-		{
-			return true;
-		}
-	}
-	return false;
-}*/
+
 }

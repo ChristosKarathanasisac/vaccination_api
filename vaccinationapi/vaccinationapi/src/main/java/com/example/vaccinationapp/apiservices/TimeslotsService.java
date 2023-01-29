@@ -1,5 +1,6 @@
 package com.example.vaccinationapp.apiservices;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Optional;
 
@@ -46,11 +47,24 @@ public class TimeslotsService {
 	
 	public ArrayList<Timeslot> getTimeslotsByMonth(String month,String year,String vacCenterCode)
 	{
+		LocalDate currentdate = LocalDate.now();
+		
+		int curDay = currentdate.getDayOfMonth();
 		ArrayList<Timeslot> timeslotsFilteredByMonth = new ArrayList<Timeslot>();
 		for(Timeslot t:this.timeslotRepository.findAll()) 
 		{
 			if(t.isMatchingToSearch(month, year, vacCenterCode) && t.isAvailable()) 
 			{
+					char temp = t.getDay().charAt(t.getDay().length()-2);
+					String timeslotDay = t.getDay();
+					if(temp == '0') 
+					{
+						timeslotDay = String.valueOf(t.getDay().charAt(t.getDay().length()-1));
+					}
+					if(Integer.valueOf(timeslotDay)<curDay) 
+					{
+						continue;
+					}
 				timeslotsFilteredByMonth.add(t);
 			}
 		}

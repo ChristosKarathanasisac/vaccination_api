@@ -60,6 +60,12 @@ public class VaccinationController {
 			resp.setWarningMessage("Some of the input filters was null");
 			return resp;
 		}
+		if(!this.applicationService.dateValidation(day, month, year)) 
+		{
+			resp.setStatus("ERROR");
+			resp.setWarningMessage("The date formatting was wrong or you searching for an older date");
+			return resp;
+		}
 		ArrayList<Timeslot> tmslots = this.timeslotService.getTimeslotsByDate(day.trim(), month.trim(), year.trim(),
 				vacCenterCode);
 		resp.setStatus("SUCCESS");
@@ -85,6 +91,12 @@ public class VaccinationController {
 		if (month == null || year == null || vacCenterCode == null) {
 			resp.setStatus("ERROR");
 			resp.setWarningMessage("Some of the input filters was null");
+			return resp;
+		}
+		if(!this.applicationService.dateValidation(month, year)) 
+		{
+			resp.setStatus("ERROR");
+			resp.setWarningMessage("The date formatting was wrong or you searching for an older date");
 			return resp;
 		}
 		ArrayList<Timeslot> tmslots = this.timeslotService.getTimeslotsByMonth(month, year, vacCenterCode);
@@ -381,6 +393,12 @@ public class VaccinationController {
 			return resp;
 		}
 		
+		if(!this.applicationService.dateValidation(timeslot.getDay(), timeslot.getMonth(),timeslot.getYear())) 
+		{
+			resp.setStatus("ERROR");
+			resp.setWarningMessage("The date formatting was wrong or you searching for an older date");
+			return resp;
+		}
 		Doctor doctor = this.applicationService.getDoctorByAMKA(timeslot.getDoc().getAmka());
 		if(doctor==null) 
 		{
