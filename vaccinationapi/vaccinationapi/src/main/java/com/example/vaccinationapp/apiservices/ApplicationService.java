@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.example.vaccinationapp.entities.*;
 import com.example.vaccinationapp.repositories.*;
@@ -60,14 +61,49 @@ public class ApplicationService {
 	
 	public boolean isRegisteredDoctor(String amka,String password) 
 	{
-		//BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-	    //String encodedPassword = passwordEncoder.encode(password);
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 	   
 		Doctor doctor = getDoctorByAMKA(amka);
 		if(doctor==null) 
 		{
 			return false;
 		}
-		return true;
+		if(encoder.matches(password, doctor.getPassword()))
+		{
+			return true;
+		}else 
+		{
+			return false;
+		}
+	}
+	
+	public boolean isRegisteredCitizen(String amka,String password) 
+	{
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		Citizen citizen = getCitizenByAMKA(amka);
+		if(citizen==null) 
+		{
+			System.out.println("Citizen was null");
+			return false;
+		}
+		if(encoder.matches(password, citizen.getPassword())) 
+		{
+			System.out.println("True");
+			return true;
+		}else 
+		{
+			System.out.println("False");
+			return false;
+		}
+	}
+	
+	
+	public void insertCitizen(Citizen aCitizen) 
+	{
+		this.citizenRepository.save(aCitizen);
+	}
+	public void insertDoctor(Doctor aDoctor) 
+	{
+		this.doctorRepository.save(aDoctor);
 	}
 }

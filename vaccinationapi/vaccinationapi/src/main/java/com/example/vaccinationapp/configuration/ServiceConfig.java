@@ -19,7 +19,7 @@ public class ServiceConfig implements CommandLineRunner{
 		appService.addVaccinationCenter(vc1);
 		appService.addVaccinationCenter(vc2);
 		
-		Doctor d1 = new Doctor("11029907820","George","Papadopoulos");
+		/*Doctor d1 = new Doctor("11029907820","George","Papadopoulos");
 		Doctor d2 = new Doctor("16020907830","Christos","Papagewrgiou");
 		Doctor d3 = new Doctor("11029707000","Nikos","Pappas");
 		Doctor d4 = new Doctor("16028977820","Stelios","Stergiou");
@@ -38,7 +38,7 @@ public class ServiceConfig implements CommandLineRunner{
 		appService.addCitizen(c2);
 		appService.addCitizen(c3);
 		appService.addCitizen(c4);
-		
+		*/
 	}
 	
 }

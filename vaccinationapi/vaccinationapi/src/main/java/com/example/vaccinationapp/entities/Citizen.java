@@ -51,6 +51,12 @@ public class Citizen {
 
 
 
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+
+
 	public String getAmka() {
 		return amka;
 	}

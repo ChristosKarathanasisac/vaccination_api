@@ -45,6 +45,12 @@ public class Doctor {
 
 
 
+	public void setPassword(String password) {
+		Password = password;
+	}
+
+
+
 	public Doctor() {
 		
 	}

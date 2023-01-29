@@ -1,17 +1,15 @@
 package com.vaccination_api.vaccinationapi.app;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,8 +22,11 @@ import com.example.vaccinationapp.apiservices.AppointmentsService;
 import com.example.vaccinationapp.apiservices.TimeslotsService;
 import com.example.vaccinationapp.apiservices.VaccinationService;
 import com.example.vaccinationapp.entities.*;
+import com.example.vaccinationapp.insertclasses.InsertCitizenRequest;
+import com.example.vaccinationapp.insertclasses.InsertDoctorRequest;
 import com.example.vaccinationapp.requestclasses.RequestBookAppointment;
 import com.example.vaccinationapp.requestclasses.RequestInsertVaccination;
+import com.example.vaccinationapp.requestclasses.RequestLogin;
 import com.example.vaccinationapp.requestclasses.RequestUpdateAppointment;
 import com.example.vaccinationapp.responseclasses.Response;
 
@@ -299,6 +300,37 @@ public class VaccinationController {
 
 	}
 
+	@PostMapping(path = "/login")
+	public Response login(@RequestBody RequestLogin r) throws Exception {
+		Response resp = new Response();
+
+		if(r==null) 
+		{
+			resp.setStatus("ERROR");
+			resp.setResultmsg("Empty Request");
+			return resp;
+		}
+
+		boolean flag=false;
+		if(r.isDoctor()) 
+		{
+			flag = this.applicationService.isRegisteredDoctor(r.getAmka(), r.getPassword());
+		}else 
+		{
+			flag = this.applicationService.isRegisteredCitizen(r.getAmka(),r.getPassword());
+		}
+		
+		if(flag) 
+		{
+			resp.setStatus("SUCCESS");
+			resp.setResultmsg("OK");
+			return resp;
+		}
+		resp.setStatus("ERROR");
+		resp.setResultmsg("User missing.");
+		return resp;
+	}
+	
 	@PostMapping(path = "/insertVaccination")
 	public Response insertVaccination(@RequestBody RequestInsertVaccination r) throws Exception {
 		Response resp = new Response();
@@ -376,4 +408,60 @@ public class VaccinationController {
 		resp.setResultmsg("Timeslot Added");
 		return resp;
 	}
+	
+	//////////////////////////////FOR TEST//////////////////////////////////
+	/////////////YOU CAN ADD CITIZENS AND DOCTORS VIA SWAGGER/////////////// 
+	@PostMapping(path = "/insertCitizen")
+	public void insertCitizen(@RequestBody InsertCitizenRequest r) throws Exception {
+
+		if(r==null) 
+		{
+			return;
+		}
+		Citizen citizen = this.applicationService.getCitizenByAMKA(r.getAmka());
+		if(citizen!=null) 
+		{
+			return;
+		}
+		
+		citizen = new Citizen();
+		citizen.setAmka(r.getAmka());
+		citizen.setAfm(r.getAfm());
+		citizen.setEmail(r.getEmail());
+		citizen.setFirstName(r.getFirstName());
+		citizen.setLastName(r.getLastName());
+		
+		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+	    String encodedPassword = passwordEncoder.encode(r.getPassword());
+		citizen.setPassword(encodedPassword);
+		
+		this.applicationService.addCitizen(citizen);
+	}
+	
+	@PostMapping(path = "/insertDoctor")
+	public void insertDoctor(@RequestBody InsertDoctorRequest r) throws Exception {
+
+		if(r==null) 
+		{
+			return;
+		}
+		Doctor doctor = this.applicationService.getDoctorByAMKA(r.getAmka());
+		if(doctor!=null) 
+		{
+			return;
+		}
+		
+		doctor = new Doctor();
+		doctor.setAmka(r.getAmka());
+		doctor.setFirstName(r.getFirstName());
+		doctor.setLastName(r.getLastName());
+		
+		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+	    String encodedPassword = passwordEncoder.encode(r.getPassword());
+	    doctor.setPassword(encodedPassword);
+		
+		this.applicationService.addDoctor(doctor);
+	}
+	
+	
 }
