@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.example.vaccinationapp.entities.*;
 import com.example.vaccinationapp.repositories.*;
 
@@ -58,4 +57,17 @@ public class ApplicationService {
 		return this.vaccinationCenterRepository.findAll();
 	}
 
+	
+	public boolean isRegisteredDoctor(String amka,String password) 
+	{
+		//BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+	    //String encodedPassword = passwordEncoder.encode(password);
+	   
+		Doctor doctor = getDoctorByAMKA(amka);
+		if(doctor==null) 
+		{
+			return false;
+		}
+		return true;
+	}
 }

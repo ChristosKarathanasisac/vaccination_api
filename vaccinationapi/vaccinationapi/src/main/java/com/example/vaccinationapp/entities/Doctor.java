@@ -16,7 +16,8 @@ public class Doctor {
 	private String firstName;
 	@JsonIgnore
 	private String lastName;
-	
+	@JsonIgnore
+	private String Password;
 	
 	@OneToMany(mappedBy="id", cascade= CascadeType.ALL, fetch = FetchType.LAZY,orphanRemoval = true)
 	//@JsonIgnore
@@ -34,6 +35,12 @@ public class Doctor {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.timeslots = new ArrayList<Timeslot>();
+	}
+
+
+
+	public String getPassword() {
+		return Password;
 	}
 
 

@@ -52,6 +52,9 @@ public class Timeslot {
 
 	}
 
+	
+	
+
 	public Timeslot(String day, String month, String year, String startHour, String startMin, String endHour,
 			String endMin, Doctor doctor, VaccinationCenter vCenter) {
 		super();
@@ -68,6 +71,9 @@ public class Timeslot {
 	}
 
 	//////////////////////// Getters and Setters///////////////////////////
+	
+	
+	
 	public Long getId() {
 		return id;
 	}
@@ -131,7 +137,6 @@ public class Timeslot {
 	public Doctor getDoc() {
 		return doc;
 	}
-
 	public void setDoc(Doctor doc) {
 		this.doc = doc;
 	}
@@ -143,7 +148,7 @@ public class Timeslot {
 	public void setVacCenter(VaccinationCenter vacCenter) {
 		this.vacCenter = vacCenter;
 	}
-
+	
 	public Appointment getAppointment() {
 		return appointment;
 	}
@@ -151,7 +156,7 @@ public class Timeslot {
 	public boolean isAvailable() {
 		return available;
 	}
-
+	
 	public void setAvailable(boolean available) {
 		this.available = available;
 	}

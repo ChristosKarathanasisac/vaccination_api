@@ -16,6 +16,12 @@ public class Citizen {
 	@JsonIgnore
 	private String lastName;
 	@JsonIgnore
+	private String password;
+	
+
+
+
+	@JsonIgnore
 	private String afm;
 	@JsonIgnore
 	private String email;
@@ -91,7 +97,9 @@ public class Citizen {
 		return appointment;
 	}
 
-
+	public String getPassword() {
+		return password;
+	}
 
 	public Vaccination getVaccination() {
 		return vaccination;
