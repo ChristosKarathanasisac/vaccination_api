@@ -34,6 +34,40 @@ public class ApplicationService {
 		citizenRepository.save(c);
 	}
 	
+	public boolean timeValidation(Timeslot t) 
+	{
+		try 
+		{
+			int startHour = Integer.valueOf(t.getStartHour());
+			int startMin = Integer.valueOf(t.getStartMin());
+			int endHour = Integer.valueOf(t.getEndHour());
+			int endMin = Integer.valueOf(t.getEndMin());
+			
+			if(endHour<startHour) 
+			{
+				return false;
+			}else if(endHour>startHour) 
+			{
+				return true;
+			}
+			
+			//case endHour=startHour-->Check the minutes
+			if(endMin <= startMin) 
+			{
+				return false;
+			}else 
+			{
+				return true;
+			}
+			
+			
+		}catch(Exception exc) 
+		{
+			return false;
+		}
+		
+	}
+	
 	public boolean dateValidation(String month,String year) 
 	{
 		//Formatting Vallidation

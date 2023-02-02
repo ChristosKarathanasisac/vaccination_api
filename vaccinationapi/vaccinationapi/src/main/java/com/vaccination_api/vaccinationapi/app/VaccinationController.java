@@ -66,7 +66,8 @@ public class VaccinationController {
 			resp.setWarningMessage("The date formatting was wrong or you searching for an older date");
 			return resp;
 		}
-		ArrayList<Timeslot> tmslots = this.timeslotService.getTimeslotsByDate(day.trim(), month.trim(), year.trim(),
+		ArrayList<Timeslot> tmslots = new ArrayList<Timeslot>();
+;	    tmslots = this.timeslotService.getTimeslotsByDate(day.trim(), month.trim(), year.trim(),
 				vacCenterCode);
 		resp.setStatus("SUCCESS");
 		resp.setObj(tmslots);
@@ -99,7 +100,8 @@ public class VaccinationController {
 			resp.setWarningMessage("The date formatting was wrong or you searching for an older date");
 			return resp;
 		}
-		ArrayList<Timeslot> tmslots = this.timeslotService.getTimeslotsByMonth(month, year, vacCenterCode);
+		ArrayList<Timeslot> tmslots = new ArrayList<Timeslot>();
+		tmslots = this.timeslotService.getTimeslotsByMonth(month, year, vacCenterCode);
 		System.out.println("Timeslot by month: "+tmslots.size());
 		resp.setStatus("SUCCESS");
 		resp.setObj(tmslots);
@@ -398,6 +400,13 @@ public class VaccinationController {
 		{
 			resp.setStatus("ERROR");
 			resp.setWarningMessage("The date formatting was wrong or you try to insert an older date");
+			return resp;
+		}
+		
+		if(!this.applicationService.timeValidation(timeslot)) 
+		{
+			resp.setStatus("ERROR");
+			resp.setWarningMessage("The time formatting was wrong or the end hour was before start hour");
 			return resp;
 		}
 		Doctor doctor = this.applicationService.getDoctorByAMKA(timeslot.getDoc().getAmka());
