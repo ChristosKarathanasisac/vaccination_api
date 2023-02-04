@@ -16,6 +16,10 @@ public class AppointmentsService {
 	@Autowired
 	ΑppointmentRepository appointmentRepository;
 
+	public AppointmentsService() {
+		super();
+	}
+	
 	public List<Appointment> getΑppointments() {
 		return appointmentRepository.findAll();
 	}
@@ -131,7 +135,7 @@ public class AppointmentsService {
 	public ArrayList<Appointment> getΑppointmentsByDay(String docAMKA, String day, String month, String year) {
 		ArrayList<Appointment> appointmentsByDay = new ArrayList<Appointment>();
 
-		for (Appointment a : appointmentRepository.findAll()) {
+		for (Appointment a : getΑppointmentsByDoc(docAMKA)) {
 			if (a.getTimeslot().getDay().equals(day) && a.getTimeslot().getMonth().equals(month)
 					&& a.getTimeslot().getYear().equals(year)) {
 				appointmentsByDay.add(a);
@@ -144,9 +148,7 @@ public class AppointmentsService {
 		appointmentRepository.save(appointment);
 	}
 
-	public AppointmentsService() {
-		super();
-	}
+	
 
 	public void removeΑppointment(Long id) throws Exception {
 		this.appointmentRepository.deleteById(id);

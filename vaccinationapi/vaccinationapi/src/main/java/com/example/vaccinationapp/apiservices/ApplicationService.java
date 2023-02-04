@@ -19,21 +19,102 @@ public class ApplicationService {
 	@Autowired
 	private CitizenRepository citizenRepository;
 	
-	public void addVaccinationCenter(VaccinationCenter v) 
-	{
-		vaccinationCenterRepository.save(v);
-	}
 	
+	//Doctors Handling
+	//////////////////
 	public void addDoctor(Doctor d) 
 	{
 		doctorRepository.save(d);
 	}
+	public Doctor getDoctorByAMKA(String amka) 
+	{
+		Optional<Doctor> byId = doctorRepository.findById(amka);
+		if(byId.isPresent()) 
+		{
+			return byId.get();
+		}
+		return null;
+			
+	}
+	public boolean isRegisteredDoctor(String amka,String password) 
+	{
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+	   
+		Doctor doctor = getDoctorByAMKA(amka);
+		if(doctor==null) 
+		{
+			return false;
+		}
+		if(encoder.matches(password, doctor.getPassword()))
+		{
+			return true;
+		}else 
+		{
+			return false;
+		}
+	}
 	
+	public void insertDoctor(Doctor aDoctor) 
+	{
+		this.doctorRepository.save(aDoctor);
+	}
+	
+	//Vaccination centers handling
+    //////////////////
+	
+	public void addVaccinationCenter(VaccinationCenter v) 
+	{
+		vaccinationCenterRepository.save(v);
+	}
+	public List<VaccinationCenter> getVaccinationCenters()
+	{
+		return this.vaccinationCenterRepository.findAll();
+	}
+	
+	//Citizens Handling
+    //////////////////
 	public void addCitizen(Citizen c) 
 	{
 		citizenRepository.save(c);
 	}
+	public Citizen getCitizenByAMKA(String amka) 
+	{
+		Optional<Citizen> byId = citizenRepository.findById(amka);
+		if(byId.isPresent()) 
+		{
+			return byId.get();
+		}
+		return null;
+			
+	}
 	
+	public boolean isRegisteredCitizen(String amka,String password) 
+	{
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		Citizen citizen = getCitizenByAMKA(amka);
+		if(citizen==null) 
+		{
+			System.out.println("Citizen was null");
+			return false;
+		}
+		if(encoder.matches(password, citizen.getPassword())) 
+		{
+			System.out.println("True");
+			return true;
+		}else 
+		{
+			System.out.println("False");
+			return false;
+		}
+	}
+	public void insertCitizen(Citizen aCitizen) 
+	{
+		this.citizenRepository.save(aCitizen);
+	}
+	
+	
+	//Times and dates validations
+	/////////////////////////////
 	public boolean timeValidation(Timeslot t) 
 	{
 		try 
@@ -146,77 +227,5 @@ public class ApplicationService {
 		return true;
 	}
 	
- 	public Citizen getCitizenByAMKA(String amka) 
-	{
-		Optional<Citizen> byId = citizenRepository.findById(amka);
-		if(byId.isPresent()) 
-		{
-			return byId.get();
-		}
-		return null;
-			
-	}
-	public Doctor getDoctorByAMKA(String amka) 
-	{
-		Optional<Doctor> byId = doctorRepository.findById(amka);
-		if(byId.isPresent()) 
-		{
-			return byId.get();
-		}
-		return null;
-			
-	}
-	public List<VaccinationCenter> getVaccinationCenters()
-	{
-		return this.vaccinationCenterRepository.findAll();
-	}
-
 	
-	public boolean isRegisteredDoctor(String amka,String password) 
-	{
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-	   
-		Doctor doctor = getDoctorByAMKA(amka);
-		if(doctor==null) 
-		{
-			return false;
-		}
-		if(encoder.matches(password, doctor.getPassword()))
-		{
-			return true;
-		}else 
-		{
-			return false;
-		}
-	}
-	
-	public boolean isRegisteredCitizen(String amka,String password) 
-	{
-		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-		Citizen citizen = getCitizenByAMKA(amka);
-		if(citizen==null) 
-		{
-			System.out.println("Citizen was null");
-			return false;
-		}
-		if(encoder.matches(password, citizen.getPassword())) 
-		{
-			System.out.println("True");
-			return true;
-		}else 
-		{
-			System.out.println("False");
-			return false;
-		}
-	}
-	
-	
-	public void insertCitizen(Citizen aCitizen) 
-	{
-		this.citizenRepository.save(aCitizen);
-	}
-	public void insertDoctor(Doctor aDoctor) 
-	{
-		this.doctorRepository.save(aDoctor);
-	}
 }

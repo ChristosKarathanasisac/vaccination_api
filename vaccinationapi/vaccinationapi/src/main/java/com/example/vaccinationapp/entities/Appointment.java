@@ -19,7 +19,6 @@ public class Appointment {
 	@JoinColumn(name = "citizen_amka")
 	private Citizen citizen;
 	
-	//@OneToOne(cascade= CascadeType.ALL, fetch = FetchType.LAZY)
 	@OneToOne(cascade= CascadeType.ALL)
     @JoinColumn(name = "timeslot",referencedColumnName = "id")
 	@JsonManagedReference
@@ -61,14 +60,6 @@ public class Appointment {
 		this.changes = changes;
 	}
 	
-	/*public boolean isActive() {
-		return active;
-	}
-	
-	
-	public void setActive(boolean available) {
-		this.active = available;
-	}*/
 	public void removeTimeslot() 
 	{
 		this.timeslot = null;

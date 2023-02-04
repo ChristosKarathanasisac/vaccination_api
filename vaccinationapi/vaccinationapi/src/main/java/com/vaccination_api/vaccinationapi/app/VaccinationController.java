@@ -36,10 +36,6 @@ import com.example.vaccinationapp.responseclasses.Response;
 @EntityScan("com.example.vaccinationapp.*")
 @EnableJpaRepositories(basePackages = { "com.example.vaccinationapp.repositories" })
 public class VaccinationController {
-	// private User user;
-	// @SpringBootApplication(scanBasePackages={
-	// "com.example.vaccinationapp.apiservices",
-	// "com.vaccination_api.vaccinationapi"})
 
 	@Autowired
 	private TimeslotsService timeslotService;
@@ -50,6 +46,11 @@ public class VaccinationController {
 	@Autowired
 	private ApplicationService applicationService;
 
+	
+	//Citizen Jobs
+	/////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////
+	
 	@GetMapping(path = "/getAvailableTimeslots")
 	public Response getAvailableTimeslots(@RequestParam(value = "day") String day,
 			@RequestParam(value = "month") String month, @RequestParam(value = "year") String year,
@@ -73,15 +74,6 @@ public class VaccinationController {
 		resp.setObj(tmslots);
 		resp.setResultmsg("OK");
 		return resp;
-	}
-
-	@GetMapping(path = "/test")
-	public List<Appointment> test() throws Exception {
-		// this.timeslotService.removeTimeslot(Long.valueOf(1));
-		// this.appointmentsService.removeΑppointment(Long.valueOf(1));
-		// this.timeslotService.test();
-		System.out.println("Appointments count: " + this.appointmentsService.getΑppointments().size());
-		return this.appointmentsService.getΑppointments();
 	}
 
 	@GetMapping(path = "/getAvailableTimeslotsByMonth")
@@ -109,16 +101,12 @@ public class VaccinationController {
 		return resp;
 	}
 
-	@GetMapping(path = "/getVaccinationCenters")
-	public List<VaccinationCenter> getVaccinationCenters() throws Exception {
-		return this.applicationService.getVaccinationCenters();
-
-	}
-
 	@PostMapping(path = "/bookAppointment")
 	public Response bookAppointment(@RequestBody RequestBookAppointment r) throws Exception {
 		Response resp = new Response();
 		Citizen citizen = applicationService.getCitizenByAMKA(r.getCitizenAMKA());
+		
+		//Input Values Check
 		if (citizen == null) {
 			resp.setStatus("ERROR");
 			resp.setWarningMessage("Missing Citizen. The Citizen was not Registered.");
@@ -131,6 +119,8 @@ public class VaccinationController {
 			resp.setWarningMessage("Missing Timeslot. Wrong timeslot id");
 			return resp;
 		}
+		
+		//Citizen Status Check
 		Vaccination oldVaccination = this.vaccinationService.getVaccinationByCitizen(r.getCitizenAMKA());
 		if (oldVaccination != null) {
 
@@ -145,6 +135,8 @@ public class VaccinationController {
 			resp.setWarningMessage("Citizen has already Appointment.");
 			return resp;
 		}
+		
+		//If all checks are ok-->Create Appointment
 		Appointment appointment = new Appointment(citizen, ts);
 
 		appointmentsService.addΑppointment(appointment);
@@ -158,6 +150,7 @@ public class VaccinationController {
 	@PostMapping(path = "/updateAppointment")
 	public Response changeAppointment(@RequestBody RequestUpdateAppointment r) throws Exception {
 
+		//Check for existing appointment
 		Response resp = new Response();
 		Appointment appointment = this.appointmentsService.getAppointmentById(r.getAppointmentID());
 		if (appointment == null) {
@@ -165,17 +158,22 @@ public class VaccinationController {
 			resp.setWarningMessage("Appointment not found.");
 			return resp;
 		}
+		//Check for existing appointment's remaining changes
 		if (appointment.getChanges() == 0) {
 			resp.setStatus("ERROR");
 			resp.setWarningMessage("Ιt is not allowed to change the appointment. MAX Changes was 2.");
 			return resp;
 		}
+		
+		//Check the validation of the new timeslot
 		Timeslot newTimeslot = this.timeslotService.getTimeslotById(r.getNewTimeslotID());
 		if (newTimeslot == null) {
 			resp.setStatus("ERROR");
 			resp.setWarningMessage("Timeslot not found.");
 			return resp;
 		}
+		
+		//If all checks are ok-->Update Appointment
 		Timeslot oldTimeslot = appointment.getTimeslot();
 
 		timeslotService.updateTimeslotStatus(oldTimeslot.getId(), true);
@@ -190,6 +188,7 @@ public class VaccinationController {
 	@GetMapping(path = "/showVaccinationStatus")
 	public Response showVaccinationStatus(@RequestParam(value = "amka") String amka) throws Exception {
 		Response resp = new Response();
+		//Input Values Check
 		Citizen c = this.applicationService.getCitizenByAMKA(amka);
 		if (c == null) {
 			resp.setStatus("ERROR");
@@ -197,6 +196,7 @@ public class VaccinationController {
 			return resp;
 		}
 
+		//Gets the vaccination Status
 		Vaccination vaccination = this.vaccinationService.getVaccinationByCitizen(amka);
 		if (vaccination == null) {
 			resp.setStatus("SUCCESS");
@@ -211,40 +211,11 @@ public class VaccinationController {
 
 	}
 
-	@PostMapping(path = "/getAppointments")
-	public Response getAppointments(@RequestBody Doctor doc) throws Exception {
-		Response resp = new Response();
-
-		if (doc == null) {
-			resp.setStatus("ERROR");
-			resp.setWarningMessage("Doctor in request was null");
-			return resp;
-		}
-
-		Doctor doctor = this.applicationService.getDoctorByAMKA(doc.getAmka());
-		if (doctor == null) {
-			resp.setStatus("ERROR");
-			resp.setWarningMessage("Missing doctor");
-			return resp;
-		}
-
-		ArrayList<Appointment> appointments = this.appointmentsService.getΑppointmentsByDoc(doctor.getAmka());
-		if (appointments == null) {
-			resp.setStatus("ERROR");
-			resp.setStatus("appointments was null");
-			return resp;
-		}
-		resp.setStatus("SUCCESS");
-		resp.setResultmsg("OK");
-		resp.setObj(appointments);
-		return resp;
-
-	}
-	
 	@PostMapping(path = "/getCitizenAppointment")
 	public Response getAppointments(@RequestBody Citizen citizen) throws Exception {
 		Response resp = new Response();
 
+		//Input Values Check
 		if (citizen == null) {
 			resp.setStatus("ERROR");
 			resp.setWarningMessage("Citizen in request was null");
@@ -258,10 +229,11 @@ public class VaccinationController {
 			return resp;
 		}
 
+		//If all check are ok get the appointment
 		Appointment appointment = this.appointmentsService.getAppointmentByCitizen(citizen.getAmka());
 		if (appointment == null) {
-			resp.setStatus("ERROR");
-			resp.setStatus("appointments was null");
+			resp.setStatus("SUCCESS");
+			resp.setResultmsg("appointments was null");
 			return resp;
 		}
 		resp.setStatus("SUCCESS");
@@ -270,9 +242,18 @@ public class VaccinationController {
 		return resp;
 
 	}
-
-	@PostMapping(path = "/getTodaysAppointments")
-	public Response getTodaysAppointments(@RequestBody Doctor doc) throws Exception {
+	
+	
+	/////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////
+	
+	//Doctor Jobs
+	/////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////
+	
+	@PostMapping(path = "/getAppointments")
+	public Response getAppointments(@RequestBody Doctor doc) throws Exception {
+		//Input Values Check
 		Response resp = new Response();
 
 		if (doc == null) {
@@ -288,6 +269,39 @@ public class VaccinationController {
 			return resp;
 		}
 
+		//If all checks are ok get the appointment
+		ArrayList<Appointment> appointments = this.appointmentsService.getΑppointmentsByDoc(doctor.getAmka());
+		if (appointments == null) {
+			resp.setStatus("SUCCESS");
+			resp.setResultmsg("appointments was null");
+			return resp;
+		}
+		resp.setStatus("SUCCESS");
+		resp.setResultmsg("OK");
+		resp.setObj(appointments);
+		return resp;
+
+	}
+	
+	@PostMapping(path = "/getTodaysAppointments")
+	public Response getTodaysAppointments(@RequestBody Doctor doc) throws Exception {
+		Response resp = new Response();
+
+		//Input Values Check
+		if (doc == null) {
+			resp.setStatus("ERROR");
+			resp.setWarningMessage("Doctor in request was null");
+			return resp;
+		}
+
+		Doctor doctor = this.applicationService.getDoctorByAMKA(doc.getAmka());
+		if (doctor == null) {
+			resp.setStatus("ERROR");
+			resp.setWarningMessage("Missing doctor");
+			return resp;
+		}
+
+		//Get current date
 		LocalDate currentdate = LocalDate.now();
 		String day = String.valueOf(currentdate.getDayOfMonth());
 		
@@ -301,11 +315,13 @@ public class VaccinationController {
 			month = "0" + month;
 		}
 
+		
+		
 		ArrayList<Appointment> appointments = this.appointmentsService.getΑppointmentsByDay(doctor.getAmka(), day,
 				month, year);
 		if (appointments == null) {
-			resp.setStatus("ERROR");
-			resp.setStatus("appointments was null");
+			resp.setStatus("SUCCESS");
+			resp.setResultmsg("appointments was null");
 			return resp;
 		}
 		resp.setStatus("SUCCESS");
@@ -315,41 +331,11 @@ public class VaccinationController {
 
 	}
 
-	@PostMapping(path = "/login")
-	public Response login(@RequestBody RequestLogin r) throws Exception {
-		Response resp = new Response();
-
-		if(r==null) 
-		{
-			resp.setStatus("ERROR");
-			resp.setResultmsg("Empty Request");
-			return resp;
-		}
-
-		boolean flag=false;
-		if(r.isDoctor()) 
-		{
-			flag = this.applicationService.isRegisteredDoctor(r.getAmka(), r.getPassword());
-		}else 
-		{
-			flag = this.applicationService.isRegisteredCitizen(r.getAmka(),r.getPassword());
-		}
-		
-		if(flag) 
-		{
-			resp.setStatus("SUCCESS");
-			resp.setResultmsg("OK");
-			return resp;
-		}
-		resp.setStatus("ERROR");
-		resp.setResultmsg("User missing.");
-		return resp;
-	}
-	
 	@PostMapping(path = "/insertVaccination")
 	public Response insertVaccination(@RequestBody RequestInsertVaccination r) throws Exception {
 		Response resp = new Response();
 
+		//Input values checks
 		Vaccination oldVaccination = this.vaccinationService.getVaccinationByCitizen(r.getCitizenAMKA());
 		if (oldVaccination != null) {
 			resp.setStatus("ERROR");
@@ -378,6 +364,7 @@ public class VaccinationController {
 			return resp;
 		}
 
+		//Insert the vaccination
 		Vaccination vac = new Vaccination(citizen, doctor, r.getDate(), DateUtils.addMonths(r.getDate(), 6));
 		vaccinationService.addVaccination(vac);
 
@@ -388,7 +375,7 @@ public class VaccinationController {
 
 	@PostMapping(path = "/insertTimeSlot")
 	public Response insertTimeSlot(@RequestBody Timeslot timeslot) throws Exception {
-
+		//Timeslot existance check
 		Response resp = new Response();
 		if ((timeslot == null)) {
 			resp.setStatus("ERROR");
@@ -396,6 +383,7 @@ public class VaccinationController {
 			return resp;
 		}
 		
+		//Timeslot date and time check
 		if(!this.applicationService.dateValidation(timeslot.getDay(), timeslot.getMonth(),timeslot.getYear())) 
 		{
 			resp.setStatus("ERROR");
@@ -409,6 +397,7 @@ public class VaccinationController {
 			resp.setWarningMessage("The time formatting was wrong or the end hour was before start hour");
 			return resp;
 		}
+		//Doctor check
 		Doctor doctor = this.applicationService.getDoctorByAMKA(timeslot.getDoc().getAmka());
 		if(doctor==null) 
 		{
@@ -417,6 +406,8 @@ public class VaccinationController {
 			return resp;
 		}
 
+		
+		//Check if the doctor has timeslot or appointment at the same time
 		String result = this.timeslotService.checkIfTimislotExist(timeslot);
 
 		if (!result.isBlank()) {
@@ -431,11 +422,61 @@ public class VaccinationController {
 			resp.setWarningMessage(result);
 			return resp;
 		}
+		
+		//If all checks are ok insert the timeslot
 		this.timeslotService.addTimeslot(timeslot);
 		resp.setStatus("SUCCESS");
 		resp.setResultmsg("Timeslot Added");
 		return resp;
 	}
+	
+	/////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////
+	
+	
+	//General Jobs
+	/////////////////////////////////////////////////////////////////////////////
+		@GetMapping(path = "/getVaccinationCenters")
+		public List<VaccinationCenter> getVaccinationCenters() throws Exception {
+			return this.applicationService.getVaccinationCenters();
+
+		}
+		
+		@PostMapping(path = "/login")
+		public Response login(@RequestBody RequestLogin r) throws Exception {
+			Response resp = new Response();
+
+			//Check the input values
+			if(r==null) 
+			{
+				resp.setStatus("ERROR");
+				resp.setResultmsg("Empty Request");
+				return resp;
+			}
+			//Check who tries to login
+
+			boolean flag=false;
+			if(r.isDoctor()) 
+			{
+				flag = this.applicationService.isRegisteredDoctor(r.getAmka(), r.getPassword());
+			}else 
+			{
+				flag = this.applicationService.isRegisteredCitizen(r.getAmka(),r.getPassword());
+			}
+			
+			if(flag) 
+			{
+				resp.setStatus("SUCCESS");
+				resp.setResultmsg("OK");
+				return resp;
+			}
+			resp.setStatus("ERROR");
+			resp.setResultmsg("User missing.");
+			return resp;
+		}
+		
+   /////////////////////////////////////////////////////////////////////////////
+   /////////////////////////////////////////////////////////////////////////////
 	
 	//////////////////////////////FOR TEST//////////////////////////////////
 	/////////////YOU CAN ADD CITIZENS AND DOCTORS VIA SWAGGER/////////////// 
